@@ -2,7 +2,7 @@
 A small script that allows you to take screenshots of every gta clothing infront of a greenscreen.
 You can use them for example in your inventory or a clothing shop.
 
-Idea and greenscreen map from this [alt:V-greenscreener](https://github.com/Stuyk/altv-greenscreener)
+Idea and greenscreen map from this [repository](https://github.com/Stuyk/altv-greenscreener).
 
 ## Features
 - Take screenshots of every gta clothing
