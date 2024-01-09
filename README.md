@@ -29,7 +29,7 @@ Personally I use [XnConvert](https://www.xnview.com/en/xnconvert/) for convertin
 If you have any better soulution for editing let me know.
 
 ## Examples
-<img src="[female_6_11.png](https://i.imgur.com/wSEe9r9.png)" width="200" height="100">
+<img src="https://i.imgur.com/wSEe9r9.png" width="200" height="100">
 
 ![male_11_57.png](https://i.imgur.com/WoNUAtP.png)
 
