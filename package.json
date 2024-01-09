@@ -1,0 +1,18 @@
+{
+  "name": "fivem-greenscreener",
+  "version": "1.0.0",
+  "description": "",
+  "main": "client.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@citizenfx/client": "^2.0.6878-1",
+    "@citizenfx/server": "^2.0.6878-1",
+    "canvas": "^2.11.2",
+    "image-js": "^0.35.5"
+  }
+}
