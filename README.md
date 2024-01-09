@@ -31,8 +31,8 @@ If you have any better soulution for editing let me know.
 ## Examples
 <img src="https://i.imgur.com/wSEe9r9.png" width="200">
 
-![male_11_57.png](https://i.imgur.com/WoNUAtP.png)
+<img src="https://i.imgur.com/WoNUAtP.png" width="200">
 
-![male_prop_1_52.png](https://i.imgur.com/PZEK3KP.png)
+<img src="https://i.imgur.com/PZEK3KP.png" width="200">
 
-![female_1_147.png](https://i.imgur.com/GK5mHFx.png)
+<img src="https://i.imgur.com/GK5mHFx.png" width="200">
