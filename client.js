@@ -193,6 +193,10 @@ function ClearAllPedProps () {
 }
 
 function ResetPed (gender) {
+  NetworkOverrideClockTime(14, 0, 0)
+  NetworkOverrideClockMillisecondsPerGameMinute(1000000)
+  SetWeatherTypeNow('EXTRASUNNY')
+
   if (gender == 'male') {
     SetPedHeadBlendData(0, 0, 0, 31, 31, 31, 1, 1, 1)
     SetPedComponentVariation(PlayerPedId(), 1, 0, 0, 0) // Mask
@@ -231,6 +235,7 @@ RegisterCommand('screenshot', async (source, args) => {
 
   NetworkOverrideClockTime(14, 0, 0)
   NetworkOverrideClockMillisecondsPerGameMinute(1000000)
+  SetWeatherTypeNow('EXTRASUNNY')
 
   for (const modelHash of modelHashes) {
     if (IsModelInCdimage(modelHash)) {
