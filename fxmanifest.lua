@@ -4,7 +4,11 @@ game 'gta5'
 description 'fivem-greenscreener'
 version '1.0.0'
 
-client_script 'client.js'
+client_scripts 'client.js'
+
+files {
+    'config.json'
+}
 
 server_script 'server.js'
 
