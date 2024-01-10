@@ -4,6 +4,8 @@ You can use them for example in your inventory or a clothing shop.
 
 Idea and greenscreen map from this [repository](https://github.com/Stuyk/altv-greenscreener).
 
+If you want to support me use [ko-fi](ko-fi.com/bentix)❤️​.
+
 ## Features
 - Take screenshots of every gta clothing
 - Comprehensible naming of the screenshots for implementing it in your scripts
