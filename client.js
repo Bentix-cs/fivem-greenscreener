@@ -262,16 +262,34 @@ RegisterCommand('screenshot', async (source, args) => {
                 component
               )
               for (let prop = 0; prop < propVariationCount; prop++) {
-                ClearPedProp(PlayerPedId(), component)
-                SetPedPropIndex(PlayerPedId(), component, prop, 0, 0)
-                await takeScreenshotForComponent(pedType, type, component, prop)
+                const textureVariationCount =
+                  GetNumberOfPedPropTextureVariations(
+                    PlayerPedId(),
+                    component,
+                    prop
+                  )
+                for (
+                  let texture = 0;
+                  texture < textureVariationCount;
+                  texture++
+                ) {
+                  ClearPedProp(PlayerPedId(), component)
+                  SetPedPropIndex(PlayerPedId(), component, prop, texture, 0)
+                  await takeScreenshotForComponent(
+                    pedType,
+                    type,
+                    component,
+                    prop,
+                    texture
+                  )
+                }
               }
             }
           }
         }
 
         SetModelAsNoLongerNeeded(modelHash)
-        break
+        return
       }
 
       for (const type of Object.keys(config.cameraSettings)) {
