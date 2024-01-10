@@ -6,7 +6,7 @@ author 'Ben'
 description 'fivem-greenscreener'
 version '1.0.0'
 
-client_scripts 'client.js'
+client_script 'client.js'
 
 files {
     'config.json'
