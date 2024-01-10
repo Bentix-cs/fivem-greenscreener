@@ -1,6 +1,8 @@
 /// <reference types="@citizenfx/client" />
 
-const config = require('./config.json')
+const config = JSON.parse(
+  LoadResourceFile(GetCurrentResourceName(), 'config.json')
+)
 
 Delay = ms => new Promise(res => setTimeout(res, ms))
 
