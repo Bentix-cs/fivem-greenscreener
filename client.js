@@ -9,6 +9,8 @@ Delay = ms => new Promise(res => setTimeout(res, ms))
 let cam = null
 let camInfo = null
 
+// Clothing
+
 async function takeScreenshotForComponent (
   pedType,
   type,
@@ -170,7 +172,7 @@ function ResetPed (gender) {
   ClearAllPedProps()
 }
 
-RegisterCommand('screenshot', async (source, args) => {
+async function StartClothingScreenshot () {
   const modelHashes = [
     GetHashKey('mp_m_freemode_01'),
     GetHashKey('mp_f_freemode_01')
@@ -334,5 +336,92 @@ RegisterCommand('screenshot', async (source, args) => {
 
       SetModelAsNoLongerNeeded(modelHash)
     }
+  }
+}
+
+// Vehicles
+
+async function takeScreenshotForVehicle (modelHash) {
+  NetworkOverrideClockTime(14, 0, 0)
+  NetworkOverrideClockMillisecondsPerGameMinute(1000000)
+  SetWeatherTypeNow('EXTRASUNNY')
+
+  const [vehicleX, vehicleY, vehicleZ] = GetEntityCoords(PlayerPedId())
+
+  const [fwdX, fwdY, fwdZ] = GetEntityForwardVector(PlayerPedId())
+
+  const fwdPos = {
+    x: vehicleX + fwdX * 1.2,
+    y: vehicleY + fwdY * 1.2,
+    z: vehicleZ + fwdZ
+  }
+
+  const [minDim, maxDim] = GetModelDimensions(modelHash)
+  const [modelSizeX, modelSizeY, modelSizeZ] = maxDim - minDim
+  const fovval = modelSizeX * modelSizeY * modelSizeZ
+  const fov = fovval + 20
+
+  cam = CreateCamWithParams(
+    'DEFAULT_SCRIPTED_CAMERA',
+    fwdPos.x,
+    fwdPos.y,
+    fwdPos.z,
+    0,
+    0,
+    0,
+    fov,
+    true,
+    0
+  )
+
+  PointCamAtCoord(cam, vehicleX, vehicleY, vehicleZ)
+}
+
+async function StartVehicleScreenshot () {
+  const models = GetAllVehicleModels()
+
+  NetworkOverrideClockTime(14, 0, 0)
+  NetworkOverrideClockMillisecondsPerGameMinute(1000000)
+  SetWeatherTypeNow('EXTRASUNNY')
+
+  for (const vehicle in models) {
+    const modelHash = GetHashKey(vehicle)
+    if (!IsModelInCdimage(modelHash)) {
+      console.log('Failed: Model not in CD image')
+      return
+    }
+    RequestModel(modelHash)
+    while (!HasModelLoaded(modelHash)) {
+      await new Promise(resolve => setTimeout(resolve, 100))
+    }
+    const veh = CreateVehicle(
+      modelHash,
+      config.greenScreenPosition.x,
+      config.greenScreenPosition.y,
+      config.greenScreenPosition.z,
+      0,
+      false,
+      true
+    )
+
+    SetEntityRotation(
+      veh,
+      config.greenScreenRotation.x,
+      config.greenScreenRotation.y,
+      config.greenScreenRotation.z,
+      0,
+      false
+    )
+    await takeScreenshotForVehicle(modelHash)
+  }
+}
+
+// Commands
+
+RegisterCommand('screenshot', async (source, args) => {
+  if (args[0] === 'clothing') {
+    StartClothingScreenshot()
+  } else if (args[0] === 'vehicle') {
+    StartVehicleScreenshot()
   }
 })
