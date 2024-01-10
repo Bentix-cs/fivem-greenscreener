@@ -10,6 +10,10 @@ If you want to support me use [ko-fi](https://ko-fi.com/bentix)❤️​.
 - Take screenshots of every gta clothing
 - Comprehensible naming of the screenshots for implementing it in your scripts
 
+## Planned
+- Make the ped invisible (Let me know if you have solutions)
+- Find a better way for editing the images
+
 ## Installation
 **Dependencies**
 - [screenshot-basic](https://github.com/citizenfx/screenshot-basic)
@@ -34,3 +38,6 @@ If you have any better soulution for editing let me know.
 <img src="https://i.imgur.com/wSEe9r9.png" width="200"> <img src="https://i.imgur.com/WoNUAtP.png" width="200">
 
 <img src="https://i.imgur.com/PZEK3KP.png" width="200"> <img src="https://i.imgur.com/GK5mHFx.png" width="200">
+
+## Support
+Discord **ben.001**
