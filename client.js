@@ -1,96 +1,22 @@
 /// <reference types="@citizenfx/client" />
 
+const config = JSON.parse(
+  LoadResourceFile(GetCurrentResourceName(), 'config.json')
+)
+
 Delay = ms => new Promise(res => setTimeout(res, ms))
 
 let cam = null
 let camInfo = null
 
-const cameraSettings = {
-  CLOTHING: {
-    [1]: {
-      fov: 30,
-      rotation: { x: 0, y: 0, z: -200 },
-      zPos: 0.65
-    },
-    [3]: {
-      fov: 45,
-      rotation: { x: 0, y: 0, z: -165 },
-      zPos: 0.3
-    },
-    [4]: {
-      fov: 60,
-      rotation: { x: 0, y: 0, z: -165 },
-      zPos: -0.3
-    },
-    [5]: {
-      fov: 40,
-      rotation: { x: 0, y: 0, z: -345 },
-      zPos: 0.3
-    },
-    [6]: {
-      fov: 40,
-      rotation: { x: 0, y: 0, z: -165 },
-      zPos: -0.85
-    },
-    [7]: {
-      fov: 45,
-      rotation: { x: 0, y: 0, z: -165 },
-      zPos: 0.3
-    },
-    [8]: {
-      fov: 45,
-      rotation: { x: 0, y: 0, z: -165 },
-      zPos: 0.3
-    },
-    [9]: {
-      fov: 45,
-      rotation: { x: 0, y: 0, z: -165 },
-      zPos: 0.3
-    },
-    [11]: {
-      fov: 45,
-      rotation: { x: 0, y: 0, z: -165 },
-      zPos: 0.3
-    }
-  },
-  PROPS: {
-    [0]: {
-      fov: 30,
-      rotation: { x: 0, y: 0, z: -200 },
-      zPos: 0.65
-    },
-    [1]: {
-      fov: 20,
-      rotation: { x: 0, y: 0, z: -200 },
-      zPos: 0.8
-    },
-    [2]: {
-      fov: 20,
-      rotation: { x: 0, y: 0, z: -82.5 },
-      zPos: 0.675
-    },
-    [6]: {
-      fov: 20,
-      rotation: { x: 0, y: 0, z: -247.5 },
-      zPos: 0
-    },
-    [7]: {
-      fov: 20,
-      rotation: { x: 0, y: 0, z: -82.5 },
-      zPos: -0.05
-    }
-  }
-}
-
-const greenScreenPosition = {
-  x: -1159.2740478515625,
-  y: -468.6954650878906,
-  z: 55.2
-}
-const greenScreenRotation = { x: 0, y: 0, z: -165 }
-
-async function takeScreenshotForComponent (pedType, type, component, drawable) {
-  const cameraInfo = cameraSettings[type][component]
+async function takeScreenshotForComponent (
+  pedType,
+  type,
+  component,
+  drawable,
+  texture
+) {
+  const cameraInfo = config.cameraSettings[type][component]
 
   if (!camInfo || camInfo.zPos !== cameraInfo.zPos) {
     camInfo = cameraInfo
@@ -104,9 +30,9 @@ async function takeScreenshotForComponent (pedType, type, component, drawable) {
     FreezeEntityPosition(PlayerPedId(), false)
     SetEntityCoordsNoOffset(
       PlayerPedId(),
-      greenScreenPosition.x,
-      greenScreenPosition.y,
-      greenScreenPosition.z,
+      config.greenScreenPosition.x,
+      config.greenScreenPosition.y,
+      config.greenScreenPosition.z,
       false,
       false,
       false
@@ -114,9 +40,9 @@ async function takeScreenshotForComponent (pedType, type, component, drawable) {
 
     SetEntityRotation(
       PlayerPedId(),
-      greenScreenRotation.x,
-      greenScreenRotation.y,
-      greenScreenRotation.z,
+      config.greenScreenRotation.x,
+      config.greenScreenRotation.y,
+      config.greenScreenRotation.z,
       2,
       false
     )
@@ -158,9 +84,9 @@ async function takeScreenshotForComponent (pedType, type, component, drawable) {
 
   SetEntityCoordsNoOffset(
     PlayerPedId(),
-    greenScreenPosition.x,
-    greenScreenPosition.y,
-    greenScreenPosition.z,
+    config.greenScreenPosition.x,
+    config.greenScreenPosition.y,
+    config.greenScreenPosition.z,
     false,
     false,
     false
@@ -176,6 +102,23 @@ async function takeScreenshotForComponent (pedType, type, component, drawable) {
   )
 
   FreezeEntityPosition(PlayerPedId(), true)
+
+  if (texture !== undefined) {
+    if (type === 'PROPS') {
+      emitNet(
+        'takeScreenshot',
+        pedType + '_prop_' + component + '_' + drawable + '_' + texture
+      )
+      await Delay(2000)
+      return
+    }
+    emitNet(
+      'takeScreenshot',
+      pedType + '_' + component + '_' + drawable + '_' + texture
+    )
+    await Delay(2000)
+    return
+  }
   if (type === 'PROPS') {
     emitNet('takeScreenshot', pedType + '_prop_' + component + '_' + drawable)
     await Delay(2000)
@@ -187,7 +130,7 @@ async function takeScreenshotForComponent (pedType, type, component, drawable) {
 }
 
 function ClearAllPedProps () {
-  for (const prop of Object.keys(cameraSettings.PROPS)) {
+  for (const prop of Object.keys(config.cameraSettings.PROPS)) {
     ClearPedProp(PlayerPedId(), parseInt(prop))
   }
 }
@@ -249,18 +192,18 @@ RegisterCommand('screenshot', async (source, args) => {
 
       SetEntityRotation(
         PlayerPedId(),
-        greenScreenRotation.x,
-        greenScreenRotation.y,
-        greenScreenRotation.z,
+        config.greenScreenRotation.x,
+        config.greenScreenRotation.y,
+        config.greenScreenRotation.z,
         0,
         false
       )
 
       SetEntityCoordsNoOffset(
         PlayerPedId(),
-        greenScreenPosition.x,
-        greenScreenPosition.y,
-        greenScreenPosition.z,
+        config.greenScreenPosition.x,
+        config.greenScreenPosition.y,
+        config.greenScreenPosition.z,
         false,
         false,
         false
@@ -272,8 +215,89 @@ RegisterCommand('screenshot', async (source, args) => {
 
       await Delay(15)
 
-      for (const type of Object.keys(cameraSettings)) {
-        for (const stringComponent of Object.keys(cameraSettings[type])) {
+      if (config.includeTextures) {
+        for (const type of Object.keys(config.cameraSettings)) {
+          for (const stringComponent of Object.keys(
+            config.cameraSettings[type]
+          )) {
+            ResetPed(pedType)
+            const component = parseInt(stringComponent)
+            if (type === 'CLOTHING') {
+              const drawableVariationCount = GetNumberOfPedDrawableVariations(
+                PlayerPedId(),
+                component
+              )
+              for (
+                let drawable = 0;
+                drawable < drawableVariationCount;
+                drawable++
+              ) {
+                const textureVariationCount = GetNumberOfPedTextureVariations(
+                  PlayerPedId(),
+                  component,
+                  drawable
+                )
+                for (
+                  let texture = 0;
+                  texture < textureVariationCount;
+                  texture++
+                ) {
+                  SetPedComponentVariation(
+                    PlayerPedId(),
+                    component,
+                    drawable,
+                    texture,
+                    0
+                  )
+                  await takeScreenshotForComponent(
+                    pedType,
+                    type,
+                    component,
+                    drawable,
+                    texture
+                  )
+                }
+              }
+            } else if (type === 'PROPS') {
+              const propVariationCount = GetNumberOfPedPropDrawableVariations(
+                PlayerPedId(),
+                component
+              )
+              for (let prop = 0; prop < propVariationCount; prop++) {
+                const textureVariationCount =
+                  GetNumberOfPedPropTextureVariations(
+                    PlayerPedId(),
+                    component,
+                    prop
+                  )
+                for (
+                  let texture = 0;
+                  texture < textureVariationCount;
+                  texture++
+                ) {
+                  ClearPedProp(PlayerPedId(), component)
+                  SetPedPropIndex(PlayerPedId(), component, prop, texture, 0)
+                  await takeScreenshotForComponent(
+                    pedType,
+                    type,
+                    component,
+                    prop,
+                    texture
+                  )
+                }
+              }
+            }
+          }
+        }
+
+        SetModelAsNoLongerNeeded(modelHash)
+        return
+      }
+
+      for (const type of Object.keys(config.cameraSettings)) {
+        for (const stringComponent of Object.keys(
+          config.cameraSettings[type]
+        )) {
           ResetPed(pedType)
           const component = parseInt(stringComponent)
           if (type === 'CLOTHING') {
