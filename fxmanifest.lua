@@ -1,6 +1,8 @@
 fx_version 'cerulean'
 game 'gta5'
 
+author 'Ben'
+
 description 'fivem-greenscreener'
 version '1.0.0'
 
