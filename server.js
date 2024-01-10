@@ -7,7 +7,7 @@ Delay = ms => new Promise(res => setTimeout(res, ms))
 
 onNet('takeScreenshot', async filename => {
   exports['screenshot-basic'].requestClientScreenshot(source, {
-    fileName: 'resources/fivem-greenscreener-js/images/' + filename + '.png',
+    fileName: 'resources/fivem-greenscreener/images/' + filename + '.png',
     encoding: 'png',
     quality: 1.0
   })
