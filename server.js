@@ -15,7 +15,7 @@ onNet('takeScreenshot', async filename => {
   await Delay(2000)
 
   let image = await imagejs.Image.load(
-    'resources/fivem-greenscreener-js/images/' + filename + '.png'
+    'resources/fivem-greenscreener/images/' + filename + '.png'
   )
   const coppedImage = image.crop({ x: image.width / 4.5, width: image.height })
 
