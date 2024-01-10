@@ -7,7 +7,13 @@ Delay = ms => new Promise(res => setTimeout(res, ms))
 let cam = null
 let camInfo = null
 
-async function takeScreenshotForComponent (pedType, type, component, drawable) {
+async function takeScreenshotForComponent (
+  pedType,
+  type,
+  component,
+  drawable,
+  texture
+) {
   const cameraInfo = config.cameraSettings[type][component]
 
   if (!camInfo || camInfo.zPos !== cameraInfo.zPos) {
@@ -94,6 +100,23 @@ async function takeScreenshotForComponent (pedType, type, component, drawable) {
   )
 
   FreezeEntityPosition(PlayerPedId(), true)
+
+  if (texture !== undefined) {
+    if (type === 'PROPS') {
+      emitNet(
+        'takeScreenshot',
+        pedType + '_prop_' + component + '_' + drawable + '_' + texture
+      )
+      await Delay(2000)
+      return
+    }
+    emitNet(
+      'takeScreenshot',
+      pedType + '_' + component + '_' + drawable + '_' + texture
+    )
+    await Delay(2000)
+    return
+  }
   if (type === 'PROPS') {
     emitNet('takeScreenshot', pedType + '_prop_' + component + '_' + drawable)
     await Delay(2000)
@@ -189,6 +212,67 @@ RegisterCommand('screenshot', async (source, args) => {
       SetPlayerModel(PlayerId(), modelHash)
 
       await Delay(15)
+
+      if (config.includeTextures) {
+        for (const type of Object.keys(config.cameraSettings)) {
+          for (const stringComponent of Object.keys(
+            config.cameraSettings[type]
+          )) {
+            ResetPed(pedType)
+            const component = parseInt(stringComponent)
+            if (type === 'CLOTHING') {
+              const drawableVariationCount = GetNumberOfPedDrawableVariations(
+                PlayerPedId(),
+                component
+              )
+              for (
+                let drawable = 0;
+                drawable < drawableVariationCount;
+                drawable++
+              ) {
+                const textureVariationCount = GetNumberOfPedTextureVariations(
+                  PlayerPedId(),
+                  component,
+                  drawable
+                )
+                for (
+                  let texture = 0;
+                  texture < textureVariationCount;
+                  texture++
+                ) {
+                  SetPedComponentVariation(
+                    PlayerPedId(),
+                    component,
+                    drawable,
+                    texture,
+                    0
+                  )
+                  await takeScreenshotForComponent(
+                    pedType,
+                    type,
+                    component,
+                    drawable,
+                    texture
+                  )
+                }
+              }
+            } else if (type === 'PROPS') {
+              const propVariationCount = GetNumberOfPedPropDrawableVariations(
+                PlayerPedId(),
+                component
+              )
+              for (let prop = 0; prop < propVariationCount; prop++) {
+                ClearPedProp(PlayerPedId(), component)
+                SetPedPropIndex(PlayerPedId(), component, prop, 0, 0)
+                await takeScreenshotForComponent(pedType, type, component, prop)
+              }
+            }
+          }
+        }
+
+        SetModelAsNoLongerNeeded(modelHash)
+        break
+      }
 
       for (const type of Object.keys(config.cameraSettings)) {
         for (const stringComponent of Object.keys(
