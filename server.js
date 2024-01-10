@@ -23,7 +23,5 @@ onNet('takeScreenshot', async filename => {
   image.width = coppedImage.width
   image.height = coppedImage.height
 
-  await image.save(
-    'resources/fivem-greenscreener-js/images/' + filename + '.png'
-  )
+  await image.save('resources/fivem-greenscreener/images/' + filename + '.png')
 })
