@@ -1,0 +1,25 @@
+@font-face {
+    font-family: opensans;
+    src: url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
+}
+
+#container {
+    margin: 0;
+    position: absolute;
+    bottom: 10%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.385);
+    width: 20%;
+    height: 5%;
+    text-align: center;
+    border-radius: 10px;
+    border: 2px solid rgb(0, 0, 0);
+}
+
+#container p {
+    color: white;
+    font-size: 1.5em;
+    margin: 3%;
+    font-family: 'opensans', sans-serif;
+}

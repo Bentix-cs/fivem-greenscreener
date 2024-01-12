@@ -6,74 +6,88 @@
         "1": {
           "fov": 30,
           "rotation": { "x": 0, "y": 0, "z": -200 },
-          "zPos": 0.65
+          "zPos": 0.65,
+          "name": "Masks"
         },
         "3": {
           "fov": 45,
           "rotation": { "x": 0, "y": 0, "z": -165 },
-          "zPos": 0.3
+          "zPos": 0.3,
+          "name": "Torsos"
         },
         "4": {
           "fov": 60,
           "rotation": { "x": 0, "y": 0, "z": -165 },
-          "zPos": -0.3
+          "zPos": -0.3,
+          "name": "Legs"
         },
         "5": {
           "fov": 40,
           "rotation": { "x": 0, "y": 0, "z": -345 },
-          "zPos": 0.3
+          "zPos": 0.3,
+          "name": "Bags"
         },
         "6": {
           "fov": 40,
           "rotation": { "x": 0, "y": 0, "z": -165 },
-          "zPos": -0.85
+          "zPos": -0.85,
+          "name": "Shoes"
         },
         "7": {
           "fov": 45,
           "rotation": { "x": 0, "y": 0, "z": -165 },
-          "zPos": 0.3
+          "zPos": 0.3,
+          "name": "Accessories"
         },
         "8": {
           "fov": 45,
           "rotation": { "x": 0, "y": 0, "z": -165 },
-          "zPos": 0.3
+          "zPos": 0.3,
+          "name": "Undershirts"
         },
         "9": {
           "fov": 45,
           "rotation": { "x": 0, "y": 0, "z": -165 },
-          "zPos": 0.3
+          "zPos": 0.3,
+          "name": "Body Armors"
         },
         "11": {
           "fov": 45,
           "rotation": { "x": 0, "y": 0, "z": -165 },
-          "zPos": 0.3
+          "zPos": 0.3,
+          "name": "Tops"
         }
       },
       "PROPS": {
         "0": {
           "fov": 30,
           "rotation": { "x": 0, "y": 0, "z": -200 },
-          "zPos": 0.65
+          "zPos": 0.65,
+          "name": "Hats"
         },
         "1": {
           "fov": 20,
           "rotation": { "x": 0, "y": 0, "z": -200 },
-          "zPos": 0.8
+          "zPos": 0.8,
+          "name": "Glasses"
         },
         "2": {
           "fov": 20,
           "rotation": { "x": 0, "y": 0, "z": -82.5 },
-          "zPos": 0.675
+          "zPos": 0.675,
+          "name": "Ears"
         },
         "6": {
           "fov": 20,
           "rotation": { "x": 0, "y": 0, "z": -247.5 },
-          "zPos": 0
+          "zPos": 0,
+          "name": "Watches"
         },
         "7": {
           "fov": 20,
           "rotation": { "x": 0, "y": 0, "z": -82.5 },
-          "zPos": -0.05
+          "zPos": -0.05,
+          "name": "Bracelets"
         }
       }
     },

@@ -9,6 +9,10 @@ Delay = ms => new Promise(res => setTimeout(res, ms))
 let cam = null
 let camInfo = null
 
+function sendNuiMessage (message) {
+  SendNuiMessage(JSON.stringify(message))
+}
+
 async function takeScreenshotForComponent (
   pedType,
   type,
@@ -182,6 +186,10 @@ RegisterCommand('screenshot', async (source, args) => {
   NetworkOverrideClockMillisecondsPerGameMinute(1000000)
   SetWeatherTypeNow('EXTRASUNNY')
 
+  sendNuiMessage({
+    start: true
+  })
+
   for (const modelHash of modelHashes) {
     if (IsModelInCdimage(modelHash)) {
       RequestModel(modelHash)
@@ -239,6 +247,11 @@ RegisterCommand('screenshot', async (source, args) => {
                   component,
                   drawable
                 )
+                sendNuiMessage({
+                  type: config.cameraSettings[type][component].name,
+                  value: drawable,
+                  max: drawableVariationCount
+                })
                 for (
                   let texture = 0;
                   texture < textureVariationCount;
@@ -272,6 +285,11 @@ RegisterCommand('screenshot', async (source, args) => {
                     component,
                     prop
                   )
+                sendNuiMessage({
+                  type: config.cameraSettings[type][component].name,
+                  value: prop,
+                  max: propVariationCount
+                })
                 for (
                   let texture = 0;
                   texture < textureVariationCount;
@@ -312,6 +330,11 @@ RegisterCommand('screenshot', async (source, args) => {
               drawable < drawableVariationCount;
               drawable++
             ) {
+              sendNuiMessage({
+                type: config.cameraSettings[type][component].name,
+                value: drawable,
+                max: drawableVariationCount
+              })
               SetPedComponentVariation(PlayerPedId(), component, drawable, 0, 0)
               await takeScreenshotForComponent(
                 pedType,
@@ -326,6 +349,11 @@ RegisterCommand('screenshot', async (source, args) => {
               component
             )
             for (let prop = 0; prop < propVariationCount; prop++) {
+              sendNuiMessage({
+                type: config.cameraSettings[type][component].name,
+                value: prop,
+                max: propVariationCount
+              })
               ClearPedProp(PlayerPedId(), component)
               SetPedPropIndex(PlayerPedId(), component, prop, 0, 0)
               await takeScreenshotForComponent(pedType, type, component, prop)
@@ -335,6 +363,10 @@ RegisterCommand('screenshot', async (source, args) => {
       }
 
       SetModelAsNoLongerNeeded(modelHash)
+
+      sendNuiMessage({
+        end: true
+      })
     }
   }
 })
