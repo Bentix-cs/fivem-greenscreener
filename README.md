@@ -9,6 +9,7 @@ If you want to support me use [ko-fi](https://ko-fi.com/bentix)❤️​.
 ## Features
 - Take screenshots of every gta clothing
 - Comprehensible naming of the screenshots for implementing it in your scripts
+- Small progress ui
 - Almost completely invisible ped
 - Config for customizing the camera positions
 - Config for enabling cycle through textrue variations
