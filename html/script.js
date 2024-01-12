@@ -23,4 +23,21 @@ window.addEventListener('message', function (event) {
       container.style.display = 'none'
     }, 2000)
   }
+  if (data.hasOwnProperty('error')) {
+    var type = data.error
+    const text = this.document.getElementById('text')
+    const container = this.document.getElementById('container')
+
+    if (type == 'weathersync') {
+      text.innerHTML = 'Disable weathersync resource!'
+      this.setTimeout(() => {
+        container.style.display = 'none'
+      }, 2000)
+    } else {
+      text.innerHTML = 'Error!'
+      this.setTimeout(() => {
+        container.style.display = 'none'
+      }, 2000)
+    }
+  }
 })

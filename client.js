@@ -182,13 +182,22 @@ RegisterCommand('screenshot', async (source, args) => {
     GetHashKey('mp_f_freemode_01')
   ]
 
+  sendNuiMessage({
+    start: true
+  })
+
+  if (GetResourceState('qb-weathersync') == 'started' || GetResourceState('weathersync') == 'started' || GetResourceState('esx_wsync') == 'started' || GetResourceState('cd_easytime') == 'started' || GetResourceState('Renewed-Weathersync') == 'started') {
+    sendNuiMessage({
+      error: 'weathersync'
+    })
+    return
+  }
+
   NetworkOverrideClockTime(14, 0, 0)
   NetworkOverrideClockMillisecondsPerGameMinute(1000000)
   SetWeatherTypeNow('EXTRASUNNY')
 
-  sendNuiMessage({
-    start: true
-  })
+  await Delay(100)
 
   for (const modelHash of modelHashes) {
     if (IsModelInCdimage(modelHash)) {
