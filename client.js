@@ -142,29 +142,31 @@ function ResetPed (gender) {
 
   if (gender == 'male') {
     SetPedHeadBlendData(0, 0, 0, 31, 31, 31, 1, 1, 1)
+    SetPedComponentVariation(PlayerPedId(), 0, 0, 1, 0) // Head
     SetPedComponentVariation(PlayerPedId(), 1, 0, 0, 0) // Mask
-    SetPedComponentVariation(PlayerPedId(), 2, 0, 0, 0) // Hair
+    SetPedComponentVariation(PlayerPedId(), 2, -1, 0, 0) // Hair
     SetPedComponentVariation(PlayerPedId(), 7, 0, 0, 0) // Accessories
     SetPedComponentVariation(PlayerPedId(), 5, 0, 0, 0) // Bags
-    SetPedComponentVariation(PlayerPedId(), 6, 5, 0, 0) // Shoes
+    SetPedComponentVariation(PlayerPedId(), 6, -1, 0, 0) // Shoes
     SetPedComponentVariation(PlayerPedId(), 9, 0, 0, 0) // Armor
-    SetPedComponentVariation(PlayerPedId(), 3, 3, 0, 0) // Torso
-    SetPedComponentVariation(PlayerPedId(), 8, 15, 0, 0) // Undershirt
-    SetPedComponentVariation(PlayerPedId(), 4, 11, 0, 0) // Legs
-    SetPedComponentVariation(PlayerPedId(), 11, 15, 0, 0) // Top
+    SetPedComponentVariation(PlayerPedId(), 3, -1, 0, 0) // Torso
+    SetPedComponentVariation(PlayerPedId(), 8, -1, 0, 0) // Undershirt
+    SetPedComponentVariation(PlayerPedId(), 4, -1, 0, 0) // Legs
+    SetPedComponentVariation(PlayerPedId(), 11, -1, 0, 0) // Top
     SetPedHairColor(PlayerPedId(), 45, 15)
   } else {
     SetPedHeadBlendData(45, 45, 45, 31, 31, 31, 1, 1, 1)
+    SetPedComponentVariation(PlayerPedId(), 0, 0, 1, 0) // Head
     SetPedComponentVariation(PlayerPedId(), 1, 0, 0, 0) // Mask
-    SetPedComponentVariation(PlayerPedId(), 2, 0, 0, 0) // Hair
+    SetPedComponentVariation(PlayerPedId(), 2, -1, 0, 0) // Hair
     SetPedComponentVariation(PlayerPedId(), 5, 0, 0, 0) // Bags
     SetPedComponentVariation(PlayerPedId(), 9, 0, 0, 0) // Armor
     SetPedComponentVariation(PlayerPedId(), 7, 0, 0, 0) // Accessories
-    SetPedComponentVariation(PlayerPedId(), 6, 5, 0, 0) // Shoes
-    SetPedComponentVariation(PlayerPedId(), 3, 8, 0, 0) // Torso
-    SetPedComponentVariation(PlayerPedId(), 8, 10, 0, 0) // Undershirt
-    SetPedComponentVariation(PlayerPedId(), 4, 13, 0, 0) // Legs
-    SetPedComponentVariation(PlayerPedId(), 11, 82, 0, 0) // Top
+    SetPedComponentVariation(PlayerPedId(), 6, -1, 0, 0) // Shoes
+    SetPedComponentVariation(PlayerPedId(), 3, -1, 0, 0) // Torso
+    SetPedComponentVariation(PlayerPedId(), 8, -1, 0, 0) // Undershirt
+    SetPedComponentVariation(PlayerPedId(), 4, -1, 0, 0) // Legs
+    SetPedComponentVariation(PlayerPedId(), 11, -1, 0, 0) // Top
     SetPedHairColor(PlayerPedId(), 45, 15)
   }
   ClearAllPedProps()
