@@ -12,38 +12,38 @@ try {
 		fs.mkdirSync(savePath);
 	}
 
-	const Delay = (ms) => new Promise((res) => setTimeout(res, ms));
-
 	onNet('takeScreenshot', async (filename) => {
-		exports['screenshot-basic'].requestClientScreenshot(source, {
-			fileName: savePath + '/' + filename + '.png',
-			encoding: 'png',
-			quality: 1.0,
-		});
+		exports['screenshot-basic'].requestClientScreenshot(
+			source,
+			{
+				fileName: savePath + '/' + filename + '.png',
+				encoding: 'png',
+				quality: 1.0,
+			},
+			async (err, fileName) => {
+				let image = await imagejs.Image.load(fileName);
+				const coppedImage = image.crop({ x: image.width / 4.5, width: image.height });
 
-		await Delay(2000);
+				image.data = coppedImage.data;
+				image.width = coppedImage.width;
+				image.height = coppedImage.height;
 
-		let image = await imagejs.Image.load(savePath + '/' + filename + '.png');
-		const coppedImage = image.crop({ x: image.width / 4.5, width: image.height });
+				for (let x = 0; x < image.width; x++) {
+					for (let y = 0; y < image.height; y++) {
+						const pixelArr = image.getPixelXY(x, y);
+						const r = pixelArr[0];
+						const g = pixelArr[1];
+						const b = pixelArr[2];
 
-		image.data = coppedImage.data;
-		image.width = coppedImage.width;
-		image.height = coppedImage.height;
-
-		for (let x = 0; x < image.width; x++) {
-			for (let y = 0; y < image.height; y++) {
-				const pixelArr = image.getPixelXY(x, y);
-				const r = pixelArr[0];
-				const g = pixelArr[1];
-				const b = pixelArr[2];
-
-				if (g > r + b) {
-					image.setPixelXY(x, y, [255, 255, 255, 0]);
+						if (g > r + b) {
+							image.setPixelXY(x, y, [255, 255, 255, 0]);
+						}
+					}
 				}
-			}
-		}
 
-		await image.save(savePath + '/' + filename + '.png');
+				image.save(fileName);
+			}
+		);
 	});
 } catch (error) {
 	console.error(error.message);
