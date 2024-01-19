@@ -2,7 +2,7 @@
 A small script that allows you to take screenshots of every gta clothing infront of a greenscreen.
 You can use them for example in your inventory or a clothing shop.
 
-Idea and greenscreen map from this [repository](https://github.com/Stuyk/altv-greenscreener).
+Greenscreen map from this [repository](https://github.com/Stuyk/altv-greenscreener).
 
 If you want to support me use [ko-fi](https://ko-fi.com/bentix)❤️​.
 
@@ -38,9 +38,7 @@ Personally I use [XnConvert](https://www.xnview.com/en/xnconvert/) for convertin
 If you have any better soulution for editing let me know.
 
 ## Examples
-<img src="https://i.imgur.com/wSEe9r9.png" width="200"> <img src="https://i.imgur.com/WoNUAtP.png" width="200">
-
-<img src="https://i.imgur.com/PZEK3KP.png" width="200"> <img src="https://i.imgur.com/GK5mHFx.png" width="200">
+<img src="https://i.imgur.com/wSEe9r9.png" width="200"> <img src="https://i.imgur.com/GK5mHFx.png" width="200">
 
 ## Support
 Discord **ben.001**

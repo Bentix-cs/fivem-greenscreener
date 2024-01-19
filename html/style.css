@@ -1,7 +1,4 @@
-@font-face {
-    font-family: opensans;
-    src: url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
-}
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
 
 #container {
     margin: 0;
@@ -21,5 +18,5 @@
     color: white;
     font-size: 1.5em;
     margin: 3%;
-    font-family: 'opensans', sans-serif;
+    font-family: 'Open Sans', sans-serif;
 }
