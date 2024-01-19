@@ -7,12 +7,13 @@ Greenscreen map from this [repository](https://github.com/Stuyk/altv-greenscreen
 If you want to support me use [ko-fi](https://ko-fi.com/bentix)❤️​.
 
 ## Features
-- Take screenshots of every gta clothing
+- Take screenshots of every gta clothing (addon clothing inclueded)
 - Comprehensible naming of the screenshots for implementing it in your scripts
 - Small progress ui
 - Almost completely invisible ped
 - Config for customizing the camera positions
 - Config for enabling cycle through textrue variations
+- Greenscreen gets removed automatically (Thanks to @hakanesnn)
 
 ## Planned
 - Find a better way for editing the images
@@ -31,11 +32,6 @@ Rename the resource from "fivem-greenscreener-main" to "fivem-greenscreener" and
 **Turn off your weather and time script.**
 Use the command `/screenshot` and the process will start.
 It will take some time and better don't touch your pc while the script runs.
-
-## Editing the images
-Personally I use [XnConvert](https://www.xnview.com/en/xnconvert/) for converting images to a .webp format and removing the greenscreen.
-
-If you have any better soulution for editing let me know.
 
 ## Examples
 <img src="https://i.imgur.com/wSEe9r9.png" width="200"> <img src="https://i.imgur.com/GK5mHFx.png" width="200">
