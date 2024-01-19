@@ -47,7 +47,7 @@ async function takeScreenshotForComponent(pedType, type, component, drawable, te
 	SetEntityHeading(ped, camInfo.rotation.z);
 	setWeatherTime();
 
-	emitNet('takeScreenshot', `${pedType}_${type == 'PROPS' ? 'prop_' : ''}${component}_${drawable}_${texture ? texture : ''}`);
+	emitNet('takeScreenshot', `${pedType}_${type == 'PROPS' ? 'prop_' : ''}${component}_${drawable}${texture ? `_${texture}`: ''}`);
 	await Delay(2000);
 	return;
 }
