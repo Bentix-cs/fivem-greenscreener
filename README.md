@@ -16,7 +16,7 @@ If you want to support me use [ko-fi](https://ko-fi.com/bentix)❤️​.
 - Greenscreen gets removed automatically (Thanks to @hakanesnn)
 
 ## Planned
-- Find a better way for editing the images
+- Maybe add it for vehicles too
 
 ## Installation
 **Dependencies**
