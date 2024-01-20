@@ -24,7 +24,7 @@ If you want to support me use [ko-fi](https://ko-fi.com/bentix)❤️​.
 - yarn
 
 ### Step 1
-Rename the resource from "fivem-greenscreener-main" to "fivem-greenscreener" and put it into your main resources folder.
+Rename the resource from "main-fivem-greenscreener" to "fivem-greenscreener" and put it into your main resources folder.
 
 **Don't use a subfolder like** `resources/[scripts]` **otherwise the script won't work**
 
