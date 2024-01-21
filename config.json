@@ -1,104 +1,160 @@
 {
-    "includeTextures": false,
-    "//__comment__//": "The image generation will take much longer and you will have much more images!",
-    "cameraSettings": {
-      "CLOTHING": {
-        "1": {
-          "fov": 30,
-          "rotation": { "x": 0, "y": 0, "z": -200 },
-          "zPos": 0.65,
-          "name": "Masks"
+  "includeTextures": false,
+  "//__comment__//": "The image generation will take much longer and you will have much more images!",
+  "cameraSettings": {
+    "CLOTHING": {
+      "1": {
+        "fov": 30,
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": -20
         },
-        "3": {
-          "fov": 45,
-          "rotation": { "x": 0, "y": 0, "z": -165 },
-          "zPos": 0.15,
-          "name": "Torsos"
-        },
-        "4": {
-          "fov": 60,
-          "rotation": { "x": 0, "y": 0, "z": -165 },
-          "zPos": -0.4,
-          "name": "Legs"
-        },
-        "5": {
-          "fov": 40,
-          "rotation": { "x": 0, "y": 0, "z": -345 },
-          "zPos": 0.3,
-          "name": "Bags"
-        },
-        "6": {
-          "fov": 40,
-          "rotation": { "x": 0, "y": 0, "z": -165 },
-          "zPos": -0.85,
-          "name": "Shoes"
-        },
-        "7": {
-          "fov": 45,
-          "rotation": { "x": 0, "y": 0, "z": -165 },
-          "zPos": 0.3,
-          "name": "Accessories"
-        },
-        "8": {
-          "fov": 45,
-          "rotation": { "x": 0, "y": 0, "z": -165 },
-          "zPos": 0.3,
-          "name": "Undershirts"
-        },
-        "9": {
-          "fov": 45,
-          "rotation": { "x": 0, "y": 0, "z": -165 },
-          "zPos": 0.3,
-          "name": "Body Armors"
-        },
-        "11": {
-          "fov": 45,
-          "rotation": { "x": 0, "y": 0, "z": -165 },
-          "zPos": 0.3,
-          "name": "Tops"
-        }
+        "zPos": 0.65,
+        "name": "Masks"
       },
-      "PROPS": {
-        "0": {
-          "fov": 30,
-          "rotation": { "x": 0, "y": 0, "z": -200 },
-          "zPos": 0.65,
-          "name": "Hats"
+      "3": {
+        "fov": 55,
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 15
         },
-        "1": {
-          "fov": 20,
-          "rotation": { "x": 0, "y": 0, "z": -200 },
-          "zPos": 0.8,
-          "name": "Glasses"
+        "zPos": 0.3,
+        "name": "Torsos"
+      },
+      "4": {
+        "fov": 60,
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 15
         },
-        "2": {
-          "fov": 20,
-          "rotation": { "x": 0, "y": 0, "z": -82.5 },
-          "zPos": 0.675,
-          "name": "Ears"
+        "zPos": -0.46,
+        "name": "Legs"
+      },
+      "5": {
+        "fov": 40,
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": -165
         },
-        "6": {
-          "fov": 20,
-          "rotation": { "x": 0, "y": 0, "z": -247.5 },
-          "zPos": 0,
-          "name": "Watches"
+        "zPos": 0.3,
+        "name": "Bags"
+      },
+      "6": {
+        "fov": 40,
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 15
         },
-        "7": {
-          "fov": 20,
-          "rotation": { "x": 0, "y": 0, "z": -82.5 },
-          "zPos": -0.05,
-          "name": "Bracelets"
-        }
+        "zPos": -0.85,
+        "name": "Shoes"
+      },
+      "7": {
+        "fov": 45,
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 15
+        },
+        "zPos": 0.3,
+        "name": "Accessories"
+      },
+      "8": {
+        "fov": 45,
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 15
+        },
+        "zPos": 0.3,
+        "name": "Undershirts"
+      },
+      "9": {
+        "fov": 45,
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 15
+        },
+        "zPos": 0.3,
+        "name": "Body Armors"
+      },
+      "11": {
+        "fov": 55,
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 15
+        },
+        "zPos": 0.26,
+        "name": "Tops"
       }
     },
-    "greenScreenPosition": {
-        "x": -1159.2740478515625,
-        "y": -468.6954650878906,
-        "z": 55.2
-    },
-    "greenScreenRotation": {
-        "x": 0,
-        "y": 0,
-        "z": -165
+    "PROPS": {
+      "0": {
+        "fov": 30,
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": -20
+        },
+        "zPos": 0.75,
+        "name": "Hats"
+      },
+      "1": {
+        "fov": 20,
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": -20
+        },
+        "zPos": 0.7,
+        "name": "Glasses"
+      },
+      "2": {
+        "fov": 20,
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 97.5
+        },
+        "zPos": 0.675,
+        "name": "Ears"
+      },
+      "6": {
+        "fov": 20,
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": -81
+        },
+        "zPos": 0.03,
+        "name": "Watches"
+      },
+      "7": {
+        "fov": 20,
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 110
+        },
+        "zPos": 0.03,
+        "name": "Bracelets"
       }
+    }
+  },
+  "greenScreenPosition": {
+    "x": -1159.2740478515625,
+    "y": -468.6954650878906,
+    "z": 55.2
+  },
+  "greenScreenRotation": {
+    "x": 0,
+    "y": 0,
+    "z": -165
   }
+}

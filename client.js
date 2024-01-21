@@ -7,6 +7,7 @@ const Delay = (ms) => new Promise((res) => setTimeout(res, ms));
 let cam;
 let camInfo;
 let ped;
+let interval;
 const playerId = PlayerId();
 
 async function takeScreenshotForComponent(pedType, type, component, drawable, texture) {
@@ -124,6 +125,10 @@ RegisterCommand('screenshot', async (source, args) => {
 
 	DisableIdleCamera(true);
 
+	interval = setInterval(() => {
+		ClearPedTasksImmediately(ped);
+	}, 1);
+
 	await Delay(100);
 
 	for (const modelHash of modelHashes) {
@@ -196,6 +201,7 @@ RegisterCommand('screenshot', async (source, args) => {
 			SetModelAsNoLongerNeeded(modelHash);
 			SetPlayerControl(playerId, true);
 			FreezeEntityPosition(ped, false);
+			clearInterval(interval);
 			SendNUIMessage({
 				end: true,
 			});
@@ -206,6 +212,7 @@ RegisterCommand('screenshot', async (source, args) => {
 on('onResourceStop', (resName) => {
 	if (GetCurrentResourceName() != resName) return;
 
+	clearInterval(interval);
 	SetPlayerControl(playerId, true);
 	FreezeEntityPosition(ped, false);
 });
