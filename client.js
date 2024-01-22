@@ -13,7 +13,7 @@ const playerId = PlayerId();
 async function takeScreenshotForComponent(pedType, type, component, drawable, texture) {
 	const cameraInfo = config.cameraSettings[type][component];
 
-	if (!camInfo) {
+	if (!camInfo || camInfo.zPos !== cameraInfo.zPos || camInfo.fov !== cameraInfo.fov) {
 		camInfo = cameraInfo;
 
 		if (cam) {
@@ -21,6 +21,11 @@ async function takeScreenshotForComponent(pedType, type, component, drawable, te
 			DestroyCam(cam, true);
 			cam = null;
 		}
+
+		SetEntityRotation(ped, config.greenScreenRotation.x, config.greenScreenRotation.y, config.greenScreenRotation.z, 0, false);
+		SetEntityCoordsNoOffset(ped, config.greenScreenPosition.x, config.greenScreenPosition.y, config.greenScreenPosition.z, false, false, false);
+
+		await Delay(50);
 
 		const [playerX, playerY, playerZ] = GetEntityCoords(ped);
 		const [fwdX, fwdY, fwdZ] = GetEntityForwardVector(ped);
@@ -36,11 +41,6 @@ async function takeScreenshotForComponent(pedType, type, component, drawable, te
 		PointCamAtCoord(cam, playerX, playerY, playerZ + camInfo.zPos);
 		SetCamActive(cam, true);
 		RenderScriptCams(true, false, 0, true, false, 0);
-	} else if (camInfo.zPos !== cameraInfo.zPos || camInfo.fov !== cameraInfo.fov) {
-		camInfo = cameraInfo;
-		const [playerX, playerY, playerZ] = GetEntityCoords(ped);
-		PointCamAtCoord(cam, playerX, playerY, playerZ + camInfo.zPos);
-		SetCamFov(cam, camInfo.fov);
 	}
 
 	await Delay(50);
