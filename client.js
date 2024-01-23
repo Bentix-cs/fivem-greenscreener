@@ -10,8 +10,8 @@ let ped;
 let interval;
 const playerId = PlayerId();
 
-async function takeScreenshotForComponent(pedType, type, component, drawable, texture) {
-	const cameraInfo = config.cameraSettings[type][component];
+async function takeScreenshotForComponent(pedType, type, component, drawable, texture, cameraSettings) {
+	const cameraInfo = cameraSettings ? cameraSettings : config.cameraSettings[type][component];
 
 	if (!camInfo || camInfo.zPos !== cameraInfo.zPos || camInfo.fov !== cameraInfo.fov) {
 		camInfo = cameraInfo;
@@ -47,6 +47,8 @@ async function takeScreenshotForComponent(pedType, type, component, drawable, te
 
 	SetEntityHeading(ped, camInfo.rotation.z);
 	setWeatherTime();
+
+	await Delay(500);
 
 	emitNet('takeScreenshot', `${pedType}_${type == 'PROPS' ? 'prop_' : ''}${component}_${drawable}${texture ? `_${texture}`: ''}`);
 	await Delay(2000);
@@ -198,6 +200,11 @@ RegisterCommand('screenshot', async (source, args) => {
 					}
 				}
 			}
+			DestroyAllCams(true);
+			DestroyCam(cam, true);
+			RenderScriptCams(false, false, 0, true, false, 0);
+			camInfo = null;
+			cam = null;
 			SetModelAsNoLongerNeeded(modelHash);
 			SetPlayerControl(playerId, true);
 			FreezeEntityPosition(ped, false);
@@ -208,6 +215,133 @@ RegisterCommand('screenshot', async (source, args) => {
 		}
 	}
 });
+
+RegisterCommand('customscreenshot', async (source, args) => {
+
+	const type = args[2].toUpperCase();
+	const component = parseInt(args[0]);
+	const drawable = parseInt(args[1]);
+	const prop = parseInt(args[1]);
+	const gender = args[3].toLowerCase();
+	let cameraSettings;
+
+
+	ped = PlayerPedId();
+	let modelHashes;
+
+	if (gender == 'male') {
+		modelHashes = [GetHashKey('mp_m_freemode_01')];
+	} else if (gender == 'female') {
+		modelHashes = [GetHashKey('mp_f_freemode_01')];
+	} else {
+		modelHashes = [GetHashKey('mp_m_freemode_01'), GetHashKey('mp_f_freemode_01')];
+	}
+
+	if (args[4] != null) {
+		for (let i = 3; i < args.length; i++) {
+			cameraSettings += args[i] + ' ';
+		}
+
+		cameraSettings = JSON.parse(cameraSettings);
+	}
+
+
+	if (
+		GetResourceState('qb-weathersync') == 'started' ||
+		GetResourceState('qbx_weathersync') == 'started' ||
+		GetResourceState('weathersync') == 'started' ||
+		GetResourceState('esx_wsync') == 'started' ||
+		GetResourceState('cd_easytime') == 'started' ||
+		GetResourceState('Renewed-Weathersync') == 'started'
+	) {
+		SendNUIMessage({
+			start: true,
+		});
+		SendNUIMessage({
+			error: 'weathersync',
+		});
+		return;
+	}
+
+	DisableIdleCamera(true);
+
+	interval = setInterval(() => {
+		ClearPedTasksImmediately(ped);
+	}, 1);
+
+	await Delay(100);
+
+	for (const modelHash of modelHashes) {
+		if (IsModelValid(modelHash)) {
+			if (!HasModelLoaded(modelHash)) {
+				RequestModel(modelHash);
+				while (!HasModelLoaded(modelHash)) {
+					await Delay(100);
+				}
+			}
+
+			const pedType = modelHash === GetHashKey('mp_m_freemode_01') ? 'male' : 'female';
+			SetEntityRotation(ped, config.greenScreenRotation.x, config.greenScreenRotation.y, config.greenScreenRotation.z, 0, false);
+			SetEntityCoordsNoOffset(ped, config.greenScreenPosition.x, config.greenScreenPosition.y, config.greenScreenPosition.z, false, false, false);
+			FreezeEntityPosition(ped, true);
+			await Delay(50);
+			SetPlayerModel(playerId, modelHash);
+			await Delay(15);
+			SetPlayerControl(playerId, false);
+			ped = PlayerPedId();
+
+			ResetPed(pedType);
+
+			if (type === 'CLOTHING') {
+				const textureVariationCount = GetNumberOfPedTextureVariations(ped, component, drawable);
+
+				if (config.includeTextures) {
+					for (let texture = 0; texture < textureVariationCount; texture++) {
+						SetPedComponentVariation(ped, component, drawable, texture, 0);
+						await takeScreenshotForComponent(pedType, type, component, drawable, texture, cameraSettings);
+					}
+				} else {
+					SetPedComponentVariation(ped, component, drawable, 0, 0);
+					await takeScreenshotForComponent(pedType, type, component, drawable, null, cameraSettings);
+				}
+			} else if (type === 'PROPS') {
+				const textureVariationCount = GetNumberOfPedPropTextureVariations(ped, component, prop);
+
+				if (config.includeTextures) {
+					for (let texture = 0; texture < textureVariationCount; texture++) {
+						ClearPedProp(ped, component);
+						SetPedPropIndex(ped, component, prop, texture, 0);
+						await takeScreenshotForComponent(pedType, type, component, prop, texture, cameraSettings);
+					}
+				} else {
+					ClearPedProp(ped, component);
+					SetPedPropIndex(ped, component, prop, 0, 0);
+					await takeScreenshotForComponent(pedType, type, component, prop, null, cameraSettings);
+				}
+			}
+
+			DestroyAllCams(true);
+			DestroyCam(cam, true);
+			RenderScriptCams(false, false, 0, true, false, 0);
+			camInfo = null;
+			cam = null;
+			SetModelAsNoLongerNeeded(modelHash);
+			SetPlayerControl(playerId, true);
+			FreezeEntityPosition(ped, false);
+			clearInterval(interval);
+		}
+	}
+});
+
+setImmediate(() => {
+	emit('chat:addSuggestion', '/customscreenshot', 'generate custom screenshot', [
+	  {name:"component", help:"The clothing component to take a screenshot of"},
+	  {name:"drawable", help:"The drawable variation to take a screenshot of"},
+	  {name:"props/clothing", help:"PROPS or CLOTHING"},
+	  {name:"male/female/both", help:"The gender to take a screenshot of"},
+	  {name:"camera settings", help:"The camera settings to use for the screenshot (optional)"},
+	]);
+  });
 
 on('onResourceStop', (resName) => {
 	if (GetCurrentResourceName() != resName) return;
