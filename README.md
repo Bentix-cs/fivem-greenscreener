@@ -7,6 +7,7 @@ Greenscreen map from this [repository](https://github.com/Stuyk/altv-greenscreen
 If you want to support me use [ko-fi](https://ko-fi.com/bentix)❤️​.
 
 For some money I will generate the pictures for you (you can send me also your modded clothes) and convert them to a format you decide (recommend .webp). 
+Contact me for that on Discord **ben.001**
 
 ## Features
 - Take screenshots of every gta clothing (addon clothing included)
