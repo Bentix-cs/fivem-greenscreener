@@ -6,7 +6,7 @@ Greenscreen map from this [repository](https://github.com/Stuyk/altv-greenscreen
 
 If you want to support me use [ko-fi](https://ko-fi.com/bentix)❤️​.
 
-For some money I will generate the pictures for you (you can send me also your modded clothes) and convert them to a format you decide (recommend .webp). 
+For some money I will generate the pictures for you (you can send me also your modded clothes) and convert them to a format you decide (recommend .webp).
 
 Contact me for that on Discord **ben.001**
 
@@ -38,6 +38,8 @@ Use the command `/screenshot` and the process will start.
 It will take some time and better don't touch your pc while the script runs.
 
 You can also use the command `/customscreenshot`, that allows you to screenshot a specific item with optional specific camera settings (format has to be the same as in the config.json).
+`/customscreenshot [component] [drawable] [props/clothing] [male/female/both] [camerasettings(optional)]`
+`/customscreenshot 11 17 clothing male {"fov": 55, "rotation": { "x": 0, "y": 0, "z": 15}, "zPos": 0.26}`
 
 ## Examples
 <img src="https://i.imgur.com/2WJyGgy.png" width="200"> <img src="https://i.imgur.com/aAQwU4d.png" width="200">
