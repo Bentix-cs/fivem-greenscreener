@@ -222,29 +222,29 @@ RegisterCommand('screenshot', async (source, args) => {
 					}
 				}
 			}
-			DestroyAllCams(true);
-			DestroyCam(cam, true);
-			RenderScriptCams(false, false, 0, true, false, 0);
-			camInfo = null;
-			cam = null;
 			SetModelAsNoLongerNeeded(modelHash);
 			SetPlayerControl(playerId, true);
 			FreezeEntityPosition(ped, false);
-			startWeatherResource();
-			clearInterval(interval);
-			SendNUIMessage({
-				end: true,
-			});
 		}
 	}
+	startWeatherResource();
+	SendNUIMessage({
+		end: true,
+	});
+	clearInterval(interval);
+	DestroyAllCams(true);
+	DestroyCam(cam, true);
+	RenderScriptCams(false, false, 0, true, false, 0);
+	camInfo = null;
+	cam = null;
 });
 
 RegisterCommand('customscreenshot', async (source, args) => {
 
 	const type = args[2].toUpperCase();
 	const component = parseInt(args[0]);
-	const drawable = args[1].toLowerCase() == 'all' ? args[1].toLowerCase() : parseInt(args[1]);
-	const prop = args[1].toLowerCase() == 'all' ? args[1].toLowerCase() : parseInt(args[1]);
+	let drawable = args[1].toLowerCase() == 'all' ? args[1].toLowerCase() : parseInt(args[1]);
+	let prop = args[1].toLowerCase() == 'all' ? args[1].toLowerCase() : parseInt(args[1]);
 	const gender = args[3].toLowerCase();
 	let cameraSettings;
 
@@ -375,19 +375,21 @@ RegisterCommand('customscreenshot', async (source, args) => {
 					}
 				}
 			}
-
-			DestroyAllCams(true);
-			DestroyCam(cam, true);
-			RenderScriptCams(false, false, 0, true, false, 0);
-			camInfo = null;
-			cam = null;
-			startWeatherResource();
 			SetModelAsNoLongerNeeded(modelHash);
 			SetPlayerControl(playerId, true);
 			FreezeEntityPosition(ped, false);
-			clearInterval(interval);
 		}
 	}
+	startWeatherResource();
+	SendNUIMessage({
+		end: true,
+	});
+	clearInterval(interval);
+	DestroyAllCams(true);
+	DestroyCam(cam, true);
+	RenderScriptCams(false, false, 0, true, false, 0);
+	camInfo = null;
+	cam = null;
 });
 
 setImmediate(() => {
