@@ -269,22 +269,7 @@ RegisterCommand('customscreenshot', async (source, args) => {
 	}
 
 
-	if (
-		GetResourceState('qb-weathersync') == 'started' ||
-		GetResourceState('qbx_weathersync') == 'started' ||
-		GetResourceState('weathersync') == 'started' ||
-		GetResourceState('esx_wsync') == 'started' ||
-		GetResourceState('cd_easytime') == 'started' ||
-		GetResourceState('Renewed-Weathersync') == 'started'
-	) {
-		SendNUIMessage({
-			start: true,
-		});
-		SendNUIMessage({
-			error: 'weathersync',
-		});
-		return;
-	}
+	if (!stopWeatherResource()) return;
 
 	DisableIdleCamera(true);
 
