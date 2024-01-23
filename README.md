@@ -36,7 +36,8 @@ It will take some time and better don't touch your pc while the script runs.
 You can also use the command `/customscreenshot`, that allows you to screenshot a specific item with optional specific camera settings (format has to be the same as in the config.json).
 
 ## Examples
-<img src="https://i.imgur.com/wSEe9r9.png" width="200"> <img src="https://i.imgur.com/GK5mHFx.png" width="200">
+<img src="https://i.imgur.com/2WJyGgy.png" width="200"> <img src="https://i.imgur.com/aAQwU4d.png" width="200">
+<img src="https://i.imgur.com/EqY5Inu.png" width="200"> <img src="https://i.imgur.com/ctTF9M9.png" width="200">
 
 ## Support
 Discord **ben.001**
