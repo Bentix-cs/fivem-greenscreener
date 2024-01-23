@@ -39,9 +39,11 @@ It will take some time and better don't touch your pc while the script runs.
 
 You can also use the command `/customscreenshot`, that allows you to screenshot a specific item with optional specific camera settings (format has to be the same as in the config.json).
 
-`/customscreenshot [component] [drawable] [props/clothing] [male/female/both] [camerasettings(optional)]`
+`/customscreenshot [component] [drawable/all] [props/clothing] [male/female/both] [camerasettings(optional)]`
 
 `/customscreenshot 11 17 clothing male {"fov": 55, "rotation": { "x": 0, "y": 0, "z": 15}, "zPos": 0.26}`
+
+`/customscreenshot 11 all clothing male {"fov": 55, "rotation": { "x": 0, "y": 0, "z": 15}, "zPos": 0.26}`
 
 ## Examples
 <img src="https://i.imgur.com/2WJyGgy.png" width="200"> <img src="https://i.imgur.com/aAQwU4d.png" width="200">

@@ -243,8 +243,8 @@ RegisterCommand('customscreenshot', async (source, args) => {
 
 	const type = args[2].toUpperCase();
 	const component = parseInt(args[0]);
-	const drawable = parseInt(args[1]);
-	const prop = parseInt(args[1]);
+	const drawable = args[1].toLowerCase() == 'all' ? args[1].toLowerCase() : parseInt(args[1]);
+	const prop = args[1].toLowerCase() == 'all' ? args[1].toLowerCase() : parseInt(args[1]);
 	const gender = args[3].toLowerCase();
 	let cameraSettings;
 
@@ -300,31 +300,79 @@ RegisterCommand('customscreenshot', async (source, args) => {
 
 			ResetPed(pedType);
 
-			if (type === 'CLOTHING') {
-				const textureVariationCount = GetNumberOfPedTextureVariations(ped, component, drawable);
-
-				if (config.includeTextures) {
-					for (let texture = 0; texture < textureVariationCount; texture++) {
-						SetPedComponentVariation(ped, component, drawable, texture, 0);
-						await takeScreenshotForComponent(pedType, type, component, drawable, texture, cameraSettings);
+			if (drawable == 'all') {
+				SendNUIMessage({
+					start: true,
+				});
+				if (type === 'CLOTHING') {
+					const drawableVariationCount = GetNumberOfPedDrawableVariations(ped, component);
+					for (drawable = 0; drawable < drawableVariationCount; drawable++) {
+						const textureVariationCount = GetNumberOfPedTextureVariations(ped, component, drawable);
+						SendNUIMessage({
+							type: cameraSettings[type][component].name,
+							value: drawable,
+							max: drawableVariationCount,
+						});
+						if (config.includeTextures) {
+							for (let texture = 0; texture < textureVariationCount; texture++) {
+								SetPedComponentVariation(ped, component, drawable, texture, 0);
+								await takeScreenshotForComponent(pedType, type, component, drawable, texture, cameraSettings);
+							}
+						} else {
+							SetPedComponentVariation(ped, component, drawable, 0, 0);
+							await takeScreenshotForComponent(pedType, type, component, drawable, null, cameraSettings);
+						}
 					}
-				} else {
-					SetPedComponentVariation(ped, component, drawable, 0, 0);
-					await takeScreenshotForComponent(pedType, type, component, drawable, null, cameraSettings);
+				} else if (type === 'PROPS') {
+					const propVariationCount = GetNumberOfPedPropDrawableVariations(ped, component);
+					for (prop = 0; prop < propVariationCount; prop++) {
+						const textureVariationCount = GetNumberOfPedPropTextureVariations(ped, component, prop);
+						SendNUIMessage({
+							type: cameraSettings[type][component].name,
+							value: prop,
+							max: propVariationCount,
+						});
+
+						if (config.includeTextures) {
+							for (let texture = 0; texture < textureVariationCount; texture++) {
+								ClearPedProp(ped, component);
+								SetPedPropIndex(ped, component, prop, texture, 0);
+								await takeScreenshotForComponent(pedType, type, component, prop, texture, cameraSettings);
+							}
+						} else {
+							ClearPedProp(ped, component);
+							SetPedPropIndex(ped, component, prop, 0, 0);
+							await takeScreenshotForComponent(pedType, type, component, prop, null, cameraSettings);
+						}
+					}
 				}
-			} else if (type === 'PROPS') {
-				const textureVariationCount = GetNumberOfPedPropTextureVariations(ped, component, prop);
+			} else if (!isNaN(drawable)) {
+				if (type === 'CLOTHING') {
+					const textureVariationCount = GetNumberOfPedTextureVariations(ped, component, drawable);
 
-				if (config.includeTextures) {
-					for (let texture = 0; texture < textureVariationCount; texture++) {
-						ClearPedProp(ped, component);
-						SetPedPropIndex(ped, component, prop, texture, 0);
-						await takeScreenshotForComponent(pedType, type, component, prop, texture, cameraSettings);
+					if (config.includeTextures) {
+						for (let texture = 0; texture < textureVariationCount; texture++) {
+							SetPedComponentVariation(ped, component, drawable, texture, 0);
+							await takeScreenshotForComponent(pedType, type, component, drawable, texture, cameraSettings);
+						}
+					} else {
+						SetPedComponentVariation(ped, component, drawable, 0, 0);
+						await takeScreenshotForComponent(pedType, type, component, drawable, null, cameraSettings);
 					}
-				} else {
-					ClearPedProp(ped, component);
-					SetPedPropIndex(ped, component, prop, 0, 0);
-					await takeScreenshotForComponent(pedType, type, component, prop, null, cameraSettings);
+				} else if (type === 'PROPS') {
+					const textureVariationCount = GetNumberOfPedPropTextureVariations(ped, component, prop);
+
+					if (config.includeTextures) {
+						for (let texture = 0; texture < textureVariationCount; texture++) {
+							ClearPedProp(ped, component);
+							SetPedPropIndex(ped, component, prop, texture, 0);
+							await takeScreenshotForComponent(pedType, type, component, prop, texture, cameraSettings);
+						}
+					} else {
+						ClearPedProp(ped, component);
+						SetPedPropIndex(ped, component, prop, 0, 0);
+						await takeScreenshotForComponent(pedType, type, component, prop, null, cameraSettings);
+					}
 				}
 			}
 
@@ -345,7 +393,7 @@ RegisterCommand('customscreenshot', async (source, args) => {
 setImmediate(() => {
 	emit('chat:addSuggestion', '/customscreenshot', 'generate custom screenshot', [
 	  {name:"component", help:"The clothing component to take a screenshot of"},
-	  {name:"drawable", help:"The drawable variation to take a screenshot of"},
+	  {name:"drawable/all", help:"The drawable variation to take a screenshot of"},
 	  {name:"props/clothing", help:"PROPS or CLOTHING"},
 	  {name:"male/female/both", help:"The gender to take a screenshot of"},
 	  {name:"camera settings", help:"The camera settings to use for the screenshot (optional)"},
