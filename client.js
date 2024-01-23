@@ -13,6 +13,10 @@ const playerId = PlayerId();
 async function takeScreenshotForComponent(pedType, type, component, drawable, texture, cameraSettings) {
 	const cameraInfo = cameraSettings ? cameraSettings : config.cameraSettings[type][component];
 
+	setWeatherTime();
+
+	await Delay(500);
+
 	if (!camInfo || camInfo.zPos !== cameraInfo.zPos || camInfo.fov !== cameraInfo.fov) {
 		camInfo = cameraInfo;
 
@@ -46,9 +50,6 @@ async function takeScreenshotForComponent(pedType, type, component, drawable, te
 	await Delay(50);
 
 	SetEntityHeading(ped, camInfo.rotation.z);
-	setWeatherTime();
-
-	await Delay(500);
 
 	emitNet('takeScreenshot', `${pedType}_${type == 'PROPS' ? 'prop_' : ''}${component}_${drawable}${texture ? `_${texture}`: ''}`);
 	await Delay(2000);
@@ -309,7 +310,7 @@ RegisterCommand('customscreenshot', async (source, args) => {
 					for (drawable = 0; drawable < drawableVariationCount; drawable++) {
 						const textureVariationCount = GetNumberOfPedTextureVariations(ped, component, drawable);
 						SendNUIMessage({
-							type: cameraSettings[type][component].name,
+							type: config.cameraSettings[type][component].name,
 							value: drawable,
 							max: drawableVariationCount,
 						});
@@ -328,7 +329,7 @@ RegisterCommand('customscreenshot', async (source, args) => {
 					for (prop = 0; prop < propVariationCount; prop++) {
 						const textureVariationCount = GetNumberOfPedPropTextureVariations(ped, component, prop);
 						SendNUIMessage({
-							type: cameraSettings[type][component].name,
+							type: config.cameraSettings[type][component].name,
 							value: prop,
 							max: propVariationCount,
 						});
