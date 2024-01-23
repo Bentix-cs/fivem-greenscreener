@@ -403,6 +403,7 @@ setImmediate(() => {
 on('onResourceStop', (resName) => {
 	if (GetCurrentResourceName() != resName) return;
 
+	startWeatherResource();
 	clearInterval(interval);
 	SetPlayerControl(playerId, true);
 	FreezeEntityPosition(ped, false);
