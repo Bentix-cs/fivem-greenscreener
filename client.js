@@ -103,6 +103,40 @@ function setWeatherTime() {
 	NetworkOverrideClockMillisecondsPerGameMinute(1000000);
 }
 
+function stopWeatherResource() {
+	if ((GetResourceState('qb-weathersync') == 'started') || (GetResourceState('qbx_weathersync') == 'started')) {
+		TriggerEvent('qb-weathersync:client:DisableSync');
+		return true
+	} else if (GetResourceState('weathersync') == 'started') {
+		TriggerEvent('weathersync:toggleSync')
+		return true
+	} else if (GetResourceState('esx_wsync') == 'started') {
+		SendNUIMessage({
+			error: 'weathersync',
+		});
+		return false
+	} else if (GetResourceState('cd_easytime') == 'started') {
+		TriggerEvent('cd_easytime:PauseSync', false)
+		return true
+	} else if (GetResourceState('vSync') == 'started' || etResourceState('Renewed-Weathersync') == 'started') {
+		TriggerEvent('vSync:toggle', false)
+		return true
+	}
+	return true
+}
+
+function startWeatherResource() {
+	if ((GetResourceState('qb-weathersync') == 'started') || (GetResourceState('qbx_weathersync') == 'started')) {
+		TriggerEvent('qb-weathersync:client:EnableSync');
+	} else if (GetResourceState('weathersync') == 'started') {
+		TriggerEvent('weathersync:toggleSync')
+	} else if (GetResourceState('cd_easytime') == 'started') {
+		TriggerEvent('cd_easytime:PauseSync', true)
+	} else if (GetResourceState('vSync') == 'started' || etResourceState('Renewed-Weathersync') == 'started') {
+		TriggerEvent('vSync:toggle', true)
+	}
+}
+
 RegisterCommand('screenshot', async (source, args) => {
 	ped = PlayerPedId();
 	const modelHashes = [GetHashKey('mp_m_freemode_01'), GetHashKey('mp_f_freemode_01')];
@@ -111,19 +145,7 @@ RegisterCommand('screenshot', async (source, args) => {
 		start: true,
 	});
 
-	if (
-		GetResourceState('qb-weathersync') == 'started' ||
-		GetResourceState('qbx_weathersync') == 'started' ||
-		GetResourceState('weathersync') == 'started' ||
-		GetResourceState('esx_wsync') == 'started' ||
-		GetResourceState('cd_easytime') == 'started' ||
-		GetResourceState('Renewed-Weathersync') == 'started'
-	) {
-		SendNUIMessage({
-			error: 'weathersync',
-		});
-		return;
-	}
+	if (!stopWeatherResource()) return;
 
 	DisableIdleCamera(true);
 
@@ -208,6 +230,7 @@ RegisterCommand('screenshot', async (source, args) => {
 			SetModelAsNoLongerNeeded(modelHash);
 			SetPlayerControl(playerId, true);
 			FreezeEntityPosition(ped, false);
+			startWeatherResource();
 			clearInterval(interval);
 			SendNUIMessage({
 				end: true,
@@ -325,6 +348,7 @@ RegisterCommand('customscreenshot', async (source, args) => {
 			RenderScriptCams(false, false, 0, true, false, 0);
 			camInfo = null;
 			cam = null;
+			startWeatherResource();
 			SetModelAsNoLongerNeeded(modelHash);
 			SetPlayerControl(playerId, true);
 			FreezeEntityPosition(ped, false);
