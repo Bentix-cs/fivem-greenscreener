@@ -118,7 +118,7 @@ function stopWeatherResource() {
 	} else if (GetResourceState('cd_easytime') == 'started') {
 		TriggerEvent('cd_easytime:PauseSync', false)
 		return true
-	} else if (GetResourceState('vSync') == 'started' || etResourceState('Renewed-Weathersync') == 'started') {
+	} else if (GetResourceState('vSync') == 'started' || GetResourceState('Renewed-Weathersync') == 'started') {
 		TriggerEvent('vSync:toggle', false)
 		return true
 	}
@@ -132,7 +132,7 @@ function startWeatherResource() {
 		TriggerEvent('weathersync:toggleSync')
 	} else if (GetResourceState('cd_easytime') == 'started') {
 		TriggerEvent('cd_easytime:PauseSync', true)
-	} else if (GetResourceState('vSync') == 'started' || etResourceState('Renewed-Weathersync') == 'started') {
+	} else if (GetResourceState('vSync') == 'started' || GetResourceState('Renewed-Weathersync') == 'started') {
 		TriggerEvent('vSync:toggle', true)
 	}
 }
