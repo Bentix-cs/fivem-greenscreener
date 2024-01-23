@@ -33,6 +33,8 @@ Rename the resource from "main-fivem-greenscreener" to "fivem-greenscreener" and
 Use the command `/screenshot` and the process will start.
 It will take some time and better don't touch your pc while the script runs.
 
+You can also use the command `/customscreenshot`, that allows you to screenshot a specific item with optional specific camera settings (format has to be the same as in the config.json).
+
 ## Examples
 <img src="https://i.imgur.com/wSEe9r9.png" width="200"> <img src="https://i.imgur.com/GK5mHFx.png" width="200">
 
