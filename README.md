@@ -7,7 +7,7 @@ Greenscreen map from this [repository](https://github.com/Stuyk/altv-greenscreen
 If you want to support me use [ko-fi](https://ko-fi.com/bentix)❤️​.
 
 ## Features
-- Take screenshots of every gta clothing (addon clothing inclueded)
+- Take screenshots of every gta clothing (addon clothing included)
 - Comprehensible naming of the screenshots for implementing it in your scripts
 - Small progress ui
 - Almost completely invisible ped
