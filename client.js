@@ -161,6 +161,10 @@ RegisterCommand('screenshot', async (source, args) => {
 				}
 			}
 
+			SetPlayerModel(playerId, modelHash);
+
+			await Delay(50);
+
 			ped = PlayerPedId();
 
 			const pedType = modelHash === GetHashKey('mp_m_freemode_01') ? 'male' : 'female';
@@ -168,8 +172,6 @@ RegisterCommand('screenshot', async (source, args) => {
 			SetEntityCoordsNoOffset(ped, config.greenScreenPosition.x, config.greenScreenPosition.y, config.greenScreenPosition.z, false, false, false);
 			FreezeEntityPosition(ped, true);
 			await Delay(50);
-			SetPlayerModel(playerId, modelHash);
-			await Delay(15);
 			SetPlayerControl(playerId, false);
 
 			interval = setInterval(() => {
@@ -286,6 +288,10 @@ RegisterCommand('customscreenshot', async (source, args) => {
 				}
 			}
 
+			SetPlayerModel(playerId, modelHash);
+
+			await Delay(50);
+
 			ped = PlayerPedId();
 
 			interval = setInterval(() => {
@@ -297,8 +303,6 @@ RegisterCommand('customscreenshot', async (source, args) => {
 			SetEntityCoordsNoOffset(ped, config.greenScreenPosition.x, config.greenScreenPosition.y, config.greenScreenPosition.z, false, false, false);
 			FreezeEntityPosition(ped, true);
 			await Delay(50);
-			SetPlayerModel(playerId, modelHash);
-			await Delay(15);
 			SetPlayerControl(playerId, false);
 
 			ResetPed(pedType);
