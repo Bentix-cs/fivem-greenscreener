@@ -139,7 +139,6 @@ function startWeatherResource() {
 }
 
 RegisterCommand('screenshot', async (source, args) => {
-	ped = PlayerPedId();
 	const modelHashes = [GetHashKey('mp_m_freemode_01'), GetHashKey('mp_f_freemode_01')];
 
 	SendNUIMessage({
@@ -150,9 +149,6 @@ RegisterCommand('screenshot', async (source, args) => {
 
 	DisableIdleCamera(true);
 
-	interval = setInterval(() => {
-		ClearPedTasksImmediately(ped);
-	}, 1);
 
 	await Delay(100);
 
@@ -165,6 +161,8 @@ RegisterCommand('screenshot', async (source, args) => {
 				}
 			}
 
+			ped = PlayerPedId();
+
 			const pedType = modelHash === GetHashKey('mp_m_freemode_01') ? 'male' : 'female';
 			SetEntityRotation(ped, config.greenScreenRotation.x, config.greenScreenRotation.y, config.greenScreenRotation.z, 0, false);
 			SetEntityCoordsNoOffset(ped, config.greenScreenPosition.x, config.greenScreenPosition.y, config.greenScreenPosition.z, false, false, false);
@@ -173,7 +171,10 @@ RegisterCommand('screenshot', async (source, args) => {
 			SetPlayerModel(playerId, modelHash);
 			await Delay(15);
 			SetPlayerControl(playerId, false);
-			ped = PlayerPedId();
+
+			interval = setInterval(() => {
+				ClearPedTasksImmediately(ped);
+			}, 1);
 
 			for (const type of Object.keys(config.cameraSettings)) {
 				for (const stringComponent of Object.keys(config.cameraSettings[type])) {
@@ -226,13 +227,13 @@ RegisterCommand('screenshot', async (source, args) => {
 			SetModelAsNoLongerNeeded(modelHash);
 			SetPlayerControl(playerId, true);
 			FreezeEntityPosition(ped, false);
+			clearInterval(interval);
 		}
 	}
 	startWeatherResource();
 	SendNUIMessage({
 		end: true,
 	});
-	clearInterval(interval);
 	DestroyAllCams(true);
 	DestroyCam(cam, true);
 	RenderScriptCams(false, false, 0, true, false, 0);
@@ -250,7 +251,6 @@ RegisterCommand('customscreenshot', async (source, args) => {
 	let cameraSettings;
 
 
-	ped = PlayerPedId();
 	let modelHashes;
 
 	if (gender == 'male') {
@@ -274,9 +274,6 @@ RegisterCommand('customscreenshot', async (source, args) => {
 
 	DisableIdleCamera(true);
 
-	interval = setInterval(() => {
-		ClearPedTasksImmediately(ped);
-	}, 1);
 
 	await Delay(100);
 
@@ -289,6 +286,12 @@ RegisterCommand('customscreenshot', async (source, args) => {
 				}
 			}
 
+			ped = PlayerPedId();
+
+			interval = setInterval(() => {
+				ClearPedTasksImmediately(ped);
+			}, 1);
+
 			const pedType = modelHash === GetHashKey('mp_m_freemode_01') ? 'male' : 'female';
 			SetEntityRotation(ped, config.greenScreenRotation.x, config.greenScreenRotation.y, config.greenScreenRotation.z, 0, false);
 			SetEntityCoordsNoOffset(ped, config.greenScreenPosition.x, config.greenScreenPosition.y, config.greenScreenPosition.z, false, false, false);
@@ -297,7 +300,6 @@ RegisterCommand('customscreenshot', async (source, args) => {
 			SetPlayerModel(playerId, modelHash);
 			await Delay(15);
 			SetPlayerControl(playerId, false);
-			ped = PlayerPedId();
 
 			ResetPed(pedType);
 
@@ -379,13 +381,13 @@ RegisterCommand('customscreenshot', async (source, args) => {
 			SetModelAsNoLongerNeeded(modelHash);
 			SetPlayerControl(playerId, true);
 			FreezeEntityPosition(ped, false);
+			clearInterval(interval);
 		}
 	}
 	startWeatherResource();
 	SendNUIMessage({
 		end: true,
 	});
-	clearInterval(interval);
 	DestroyAllCams(true);
 	DestroyCam(cam, true);
 	RenderScriptCams(false, false, 0, true, false, 0);
