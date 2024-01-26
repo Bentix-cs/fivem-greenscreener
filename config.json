@@ -48,7 +48,7 @@
         "rotation": {
           "x": 0,
           "y": 0,
-          "z": 15
+          "z": -20
         },
         "zPos": -0.85,
         "name": "Shoes"
