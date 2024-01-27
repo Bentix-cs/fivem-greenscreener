@@ -193,10 +193,18 @@ RegisterCommand('screenshot', async (source, args) => {
 							});
 							if (config.includeTextures) {
 								for (let texture = 0; texture < textureVariationCount; texture++) {
+									SetPedPreloadVariationData(ped, component, drawable, texture);
+									while (!HasPedPreloadVariationDataFinished(ped)) {
+										await Delay(50);
+									}
 									SetPedComponentVariation(ped, component, drawable, texture, 0);
 									await takeScreenshotForComponent(pedType, type, component, drawable, texture);
 								}
 							} else {
+								SetPedPreloadVariationData(ped, component, drawable, 0);
+								while (!HasPedPreloadVariationDataFinished(ped)) {
+									await Delay(50);
+								}
 								SetPedComponentVariation(ped, component, drawable, 0, 0);
 								await takeScreenshotForComponent(pedType, type, component, drawable);
 							}
@@ -213,11 +221,19 @@ RegisterCommand('screenshot', async (source, args) => {
 
 							if (config.includeTextures) {
 								for (let texture = 0; texture < textureVariationCount; texture++) {
+									SetPedPreloadPropData(ped, component, drawable, texture);
+									while (!HasPedPreloadPropDataFinished(ped)) {
+										await Delay(50);
+									}
 									ClearPedProp(ped, component);
 									SetPedPropIndex(ped, component, prop, texture, 0);
 									await takeScreenshotForComponent(pedType, type, component, prop, texture);
 								}
 							} else {
+								SetPedPreloadPropData(ped, component, drawable, 0);
+								while (!HasPedPreloadPropDataFinished(ped)) {
+									await Delay(50);
+								}
 								ClearPedProp(ped, component);
 								SetPedPropIndex(ped, component, prop, 0, 0);
 								await takeScreenshotForComponent(pedType, type, component, prop);
@@ -322,10 +338,18 @@ RegisterCommand('customscreenshot', async (source, args) => {
 						});
 						if (config.includeTextures) {
 							for (let texture = 0; texture < textureVariationCount; texture++) {
+								SetPedPreloadVariationData(ped, component, drawable, texture);
+								while (!HasPedPreloadVariationDataFinished(ped)) {
+									await Delay(50);
+								}
 								SetPedComponentVariation(ped, component, drawable, texture, 0);
 								await takeScreenshotForComponent(pedType, type, component, drawable, texture, cameraSettings);
 							}
 						} else {
+							SetPedPreloadVariationData(ped, component, drawable, 0);
+							while (!HasPedPreloadVariationDataFinished(ped)) {
+								await Delay(50);
+							}
 							SetPedComponentVariation(ped, component, drawable, 0, 0);
 							await takeScreenshotForComponent(pedType, type, component, drawable, null, cameraSettings);
 						}
@@ -342,11 +366,19 @@ RegisterCommand('customscreenshot', async (source, args) => {
 
 						if (config.includeTextures) {
 							for (let texture = 0; texture < textureVariationCount; texture++) {
+								SetPedPreloadPropData(ped, component, drawable, texture);
+								while (!HasPedPreloadPropDataFinished(ped)) {
+									await Delay(50);
+								}
 								ClearPedProp(ped, component);
 								SetPedPropIndex(ped, component, prop, texture, 0);
 								await takeScreenshotForComponent(pedType, type, component, prop, texture, cameraSettings);
 							}
 						} else {
+							SetPedPreloadPropData(ped, component, drawable, 0);
+								while (!HasPedPreloadPropDataFinished(ped)) {
+									await Delay(50);
+								}
 							ClearPedProp(ped, component);
 							SetPedPropIndex(ped, component, prop, 0, 0);
 							await takeScreenshotForComponent(pedType, type, component, prop, null, cameraSettings);
@@ -359,10 +391,18 @@ RegisterCommand('customscreenshot', async (source, args) => {
 
 					if (config.includeTextures) {
 						for (let texture = 0; texture < textureVariationCount; texture++) {
+							SetPedPreloadVariationData(ped, component, drawable, texture);
+							while (!HasPedPreloadVariationDataFinished(ped)) {
+								await Delay(50);
+							}
 							SetPedComponentVariation(ped, component, drawable, texture, 0);
 							await takeScreenshotForComponent(pedType, type, component, drawable, texture, cameraSettings);
 						}
 					} else {
+						SetPedPreloadVariationData(ped, component, drawable, 0);
+						while (!HasPedPreloadVariationDataFinished(ped)) {
+							await Delay(50);
+						}
 						SetPedComponentVariation(ped, component, drawable, 0, 0);
 						await takeScreenshotForComponent(pedType, type, component, drawable, null, cameraSettings);
 					}
@@ -371,11 +411,19 @@ RegisterCommand('customscreenshot', async (source, args) => {
 
 					if (config.includeTextures) {
 						for (let texture = 0; texture < textureVariationCount; texture++) {
+							SetPedPreloadPropData(ped, component, drawable, texture);
+							while (!HasPedPreloadPropDataFinished(ped)) {
+								await Delay(50);
+							}
 							ClearPedProp(ped, component);
 							SetPedPropIndex(ped, component, prop, texture, 0);
 							await takeScreenshotForComponent(pedType, type, component, prop, texture, cameraSettings);
 						}
 					} else {
+						SetPedPreloadPropData(ped, component, drawable, 0);
+						while (!HasPedPreloadPropDataFinished(ped)) {
+							await Delay(50);
+						}
 						ClearPedProp(ped, component);
 						SetPedPropIndex(ped, component, prop, 0, 0);
 						await takeScreenshotForComponent(pedType, type, component, prop, null, cameraSettings);
