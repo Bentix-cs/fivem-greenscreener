@@ -74,7 +74,7 @@ async function takeScreenshotForObject(object, hash) {
 		y: maxDimY - minDimY,
 		z: maxDimZ - minDimZ
 	}
-	let fov = Math.max(modelSize.x, modelSize.z) / 0.15 * 10;
+	let fov = Math.min(Math.max(modelSize.x, modelSize.z) / 0.15 * 10, 60);
 
 
 	const [objectX, objectY, objectZ] = GetEntityCoords(object, false);
@@ -87,10 +87,12 @@ async function takeScreenshotForObject(object, hash) {
 	}
 
 	const fwdPos = {
-		x: center.x + fwdX * 1.2,
-		y: center.y + fwdY * 1.2,
+		x: center.x + fwdX * 1.2 + Math.max(modelSize.x, modelSize.z) / 2,
+		y: center.y + fwdY * 1.2 + Math.max(modelSize.x, modelSize.z) / 2,
 		z: center.z + fwdZ,
 	};
+
+	console.log(modelSize.x, modelSize.z)
 
 	cam = CreateCamWithParams('DEFAULT_SCRIPTED_CAMERA', fwdPos.x, fwdPos.y, fwdPos.z, 0, 0, 0, fov, true, 0);
 
@@ -155,7 +157,7 @@ function setWeatherTime() {
 	SetWeatherTypePersist('EXTRASUNNY');
 	SetWeatherTypeNow('EXTRASUNNY');
 	SetWeatherTypeNowPersist('EXTRASUNNY');
-	NetworkOverrideClockTime(14, 0, 0);
+	NetworkOverrideClockTime(18, 0, 0);
 	NetworkOverrideClockMillisecondsPerGameMinute(1000000);
 }
 
