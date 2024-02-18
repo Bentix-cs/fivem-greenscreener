@@ -287,7 +287,7 @@ RegisterCommand('screenshot', async (source, args) => {
 									await takeScreenshotForComponent(pedType, type, component, prop, texture);
 								}
 							} else {
-								SetPedPreloadPropData(ped, component, drawable, 0);
+								SetPedPreloadPropData(ped, component, prop, 0);
 								while (!HasPedPreloadPropDataFinished(ped)) {
 									await Delay(50);
 								}
