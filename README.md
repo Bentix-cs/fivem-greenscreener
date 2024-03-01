@@ -24,6 +24,9 @@ Contact me for that on Discord **ben.001**
 ## Planned
 - Maybe add it for vehicles too
 
+## Known issues
+- After the players model switch, the clothing does not to appear (please let me know if you have a fix for that)
+
 ## Installation
 **Dependencies**
 - [screenshot-basic](https://github.com/citizenfx/screenshot-basic)
