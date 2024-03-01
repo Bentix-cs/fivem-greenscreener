@@ -110,6 +110,13 @@ async function takeScreenshotForObject(object, hash) {
 
 }
 
+function SetPedOnGround() {
+	const [x, y, z] = GetEntityCoords(ped, false);
+	const [retval, ground] = GetGroundZFor_3dCoord(x, y, z, 0, false);
+	SetEntityCoords(ped, x, y, ground, false, false, false, false);
+
+}
+
 function ClearAllPedProps() {
 	for (const prop of Object.keys(config.cameraSettings.PROPS)) {
 		ClearPedProp(ped, parseInt(prop));
@@ -118,21 +125,9 @@ function ClearAllPedProps() {
 
 async function ResetPedComponents() {
 
-	SetPedComponentVariation(ped, 0, 1, 1, 0); // Head
-	SetPedComponentVariation(ped, 1, 1, 0, 0); // Mask
-	SetPedComponentVariation(ped, 2, 1, 0, 0); // Hair
-	SetPedComponentVariation(ped, 7, 1, 0, 0); // Accessories
-	SetPedComponentVariation(ped, 5, 1, 0, 0); // Bags
-	SetPedComponentVariation(ped, 6, 1, 0, 0); // Shoes
-	SetPedComponentVariation(ped, 9, 1, 0, 0); // Armor
-	SetPedComponentVariation(ped, 3, 1, 0, 0); // Torso
-	SetPedComponentVariation(ped, 8, 1, 0, 0); // Undershirt
-	SetPedComponentVariation(ped, 4, 1, 0, 0); // Legs
-	SetPedComponentVariation(ped, 11, 1, 0, 0); // Top
-	SetPedHairColor(ped, 2, 4);
+	SetPedDefaultComponentVariation(ped);
 
-
-	await Delay(50);
+	await Delay(150);
 
 	SetPedComponentVariation(ped, 0, 0, 1, 0); // Head
 	SetPedComponentVariation(ped, 1, 0, 0, 0); // Mask
@@ -164,24 +159,24 @@ function setWeatherTime() {
 function stopWeatherResource() {
 	if ((GetResourceState('qb-weathersync') == 'started') || (GetResourceState('qbx_weathersync') == 'started')) {
 		TriggerEvent('qb-weathersync:client:DisableSync');
-		return true
+		return true;
 	} else if (GetResourceState('weathersync') == 'started') {
 		TriggerEvent('weathersync:toggleSync')
-		return true
+		return true;
 	} else if (GetResourceState('esx_wsync') == 'started') {
 		SendNUIMessage({
 			error: 'weathersync',
 		});
-		return false
+		return false;
 	} else if (GetResourceState('cd_easytime') == 'started') {
 		TriggerEvent('cd_easytime:PauseSync', false)
-		return true
+		return true;
 	} else if (GetResourceState('vSync') == 'started' || GetResourceState('Renewed-Weathersync') == 'started') {
 		TriggerEvent('vSync:toggle', false)
-		return true
+		return true;
 	}
-	return true
-}
+	return true;
+};
 
 function startWeatherResource() {
 	if ((GetResourceState('qb-weathersync') == 'started') || (GetResourceState('qbx_weathersync') == 'started')) {
@@ -222,6 +217,8 @@ RegisterCommand('screenshot', async (source, args) => {
 			await Delay(150);
 			SetModelAsNoLongerNeeded(modelHash);
 
+			await Delay(150);
+
 			ped = PlayerPedId();
 
 			const pedType = modelHash === GetHashKey('mp_m_freemode_01') ? 'male' : 'female';
@@ -238,6 +235,7 @@ RegisterCommand('screenshot', async (source, args) => {
 			for (const type of Object.keys(config.cameraSettings)) {
 				for (const stringComponent of Object.keys(config.cameraSettings[type])) {
 					await ResetPedComponents();
+					await Delay(150);
 					const component = parseInt(stringComponent);
 					if (type === 'CLOTHING') {
 						const drawableVariationCount = GetNumberOfPedDrawableVariations(ped, component);
@@ -305,6 +303,7 @@ RegisterCommand('screenshot', async (source, args) => {
 			clearInterval(interval);
 		}
 	}
+	SetPedOnGround();
 	startWeatherResource();
 	SendNUIMessage({
 		end: true,
@@ -362,8 +361,10 @@ RegisterCommand('customscreenshot', async (source, args) => {
 			}
 
 			SetPlayerModel(playerId, modelHash);
+			await Delay(150);
+			SetModelAsNoLongerNeeded(modelHash);
 
-			await Delay(50);
+			await Delay(150);
 
 			ped = PlayerPedId();
 
@@ -379,6 +380,7 @@ RegisterCommand('customscreenshot', async (source, args) => {
 			SetPlayerControl(playerId, false);
 
 			ResetPedComponents();
+			await Delay(150);
 
 			if (drawable == 'all') {
 				SendNUIMessage({
@@ -487,12 +489,12 @@ RegisterCommand('customscreenshot', async (source, args) => {
 					}
 				}
 			}
-			SetModelAsNoLongerNeeded(modelHash);
 			SetPlayerControl(playerId, true);
 			FreezeEntityPosition(ped, false);
 			clearInterval(interval);
 		}
 	}
+	SetPedOnGround();
 	startWeatherResource();
 	SendNUIMessage({
 		end: true,
@@ -506,7 +508,7 @@ RegisterCommand('customscreenshot', async (source, args) => {
 
 RegisterCommand('screenshotobject', async (source, args) => {
 	const modelHash = Number(args[0]);
-	const ped = PlayerPedId();
+	const ped = GetPlayerPed(-1);
 
 	if (!stopWeatherResource()) return;
 
