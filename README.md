@@ -25,7 +25,7 @@ Contact me for that on Discord **ben.001**
 - Maybe add it for vehicles too
 
 ## Known issues
-- After the players model switch, the clothing does not to appear (please let me know if you have a fix for that)
+- After the players model switch, the clothing does not appear (please let me know if you have a fix for that)
 
 ## Installation
 **Dependencies**
