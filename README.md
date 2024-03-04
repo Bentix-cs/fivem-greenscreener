@@ -1,5 +1,5 @@
 # fivem-greenscreener
-## If you want to support me use [ko-fi](https://ko-fi.com/bentix)❤️​.
+
 A small script that allows you to take screenshots of every gta clothing or prop infront of a greenscreen.
 You can use them for example in your inventory or a clothing shop.
 
@@ -63,3 +63,5 @@ For screenshoting objects you can use the command `/screenshotobject [hash]`.
 
 ## Support
 Discord **ben.001**
+
+## If you want to support me use [ko-fi](https://ko-fi.com/bentix)❤️​.
