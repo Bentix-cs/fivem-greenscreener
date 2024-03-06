@@ -8,7 +8,7 @@ You are granted the freedom to utilize the images in your open-source projects w
 For commercial usage, please reach out to me on Discord to discuss pricing and conditions.
 
 ## Services Offered
-For a fee, I offer a service where I generate the images for you. You can also send me your custom clothing mods, and I will include them.
+For a fee, I offer a service where I generate the images for you. You can also send me your custom clothing, vehicles or props, and I will include them.
 Contact me on Discord at **ben.001** for inquiries.
 
 ## Key Features
