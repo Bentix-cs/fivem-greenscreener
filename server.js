@@ -5,14 +5,18 @@ const imagejs = require('image-js');
 const fs = require('fs');
 
 const resName = GetCurrentResourceName();
-const savePath = `resources/${resName}/images`;
+const mainSavePath = `resources/${resName}/images`;
 
 try {
-	if (!fs.existsSync(savePath)) {
-		fs.mkdirSync(savePath);
+	if (!fs.existsSync(mainSavePath)) {
+		fs.mkdirSync(mainSavePath);
 	}
 
-	onNet('takeScreenshot', async (filename) => {
+	onNet('takeScreenshot', async (filename, type) => {
+		const savePath = `${mainSavePath}/${type}`;
+		if (!fs.existsSync(savePath)) {
+			fs.mkdirSync(savePath);
+		}
 		exports['screenshot-basic'].requestClientScreenshot(
 			source,
 			{

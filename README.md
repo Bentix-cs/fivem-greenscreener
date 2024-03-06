@@ -1,32 +1,30 @@
 # fivem-greenscreener
 
-A small script that allows you to take screenshots of every gta clothing or prop infront of a greenscreen.
-You can use them for example in your inventory or a clothing shop.
+A small script that allows you to take screenshots of every gta clothing, prop/object or vehicle against a greenscreen.
+You can use them for example in your inventory, clothing store or vehicle store.
 
 ## Using the images
+You are granted the freedom to utilize the images in your open-source projects with proper accreditation.
+For commercial usage, please reach out to me on Discord to discuss pricing and conditions.
 
-You are free to use the images in your open source projects if you credit me :) 
-For commercial use you have to contact me on discord so we can discuss the price and conditions.
+## Services Offered
+For a fee, I offer a service where I generate the images for you. You can also send me your custom clothing mods, and I will include them.
+Contact me on Discord at **ben.001** for inquiries.
 
-## Service
-
-For some money I will generate the pictures for you (you can send me also your modded clothes) and convert them to a format you decide (recommend .webp).
-
-Contact me for that on Discord **ben.001**
-
-## Features
-- Take screenshots of every gta clothing (addon clothing included)
-- Take screenshots of every object in gta (addon props included)
-- Comprehensible naming of the screenshots for implementing it in your scripts
-- Small progress ui
+## Key Features
+- Capture screenshots of every GTA clothing item, including addon clothing
+- Capture screenshots of all objects and props in GTA, including addon props
+- Capture screenshots of every vehicle in GTA, including addon vehicles
+- Screenshots are labeled comprehensively for seamless integration into your scripts
+- Minimalistic progress UI for user convenience
 - Almost completely invisible ped
-- Config for customizing the camera positions
-- Config for enabling cycle through textrue variations
-- Greenscreen gets removed automatically (Thanks to @hakanesnn)
-- Big greenscreen box (Thanks to [@jimgordon20](https://github.com/jimgordon20/jim_g_green_screen))
+- Customizable camera positions through configuration settings
+- Option to enable cycling through texture variations
+- Automatic removal of the greenscreen backdrop (courtesy of [@hakanesnn](https://github.com/hakanesnn))
+- Utilizes a large greenscreen box (thanks to [@jimgordon20](https://github.com/jimgordon20/jim_g_green_screen))
 
-## Planned
-- Maybe add it for vehicles too
+## Planned Updates
+- Feel free to share any ideas or suggestions for future enhancements!
 
 ## Installation
 **Dependencies**
@@ -34,18 +32,18 @@ Contact me for that on Discord **ben.001**
 - yarn
 
 ### Step 1
-Rename the resource from "main-fivem-greenscreener" to "fivem-greenscreener" and put it into your main resources folder.
+Simply place the resource in your resources folder.
 
-**Don't use a subfolder like** `resources/[scripts]` **otherwise the script won't work**
+**Do not use a subfolder like `resources/[scripts]` as it will cause the script to malfunction.**
 
 ## Usage
 ### Screenshot all clothing
-Use the command `/screenshot` and the process for clothing will start.
-It will take some time and better don't touch your pc while the script runs.
+Execute the command `/screenshot` to initiate the clothing screenshot process.
+Be patient as it may take some time to complete, and it's advisable not to interfere with your PC during this operation.
 
 
 ### Screenshot specific clothing
-Use the command `/customscreenshot`, that allows you to screenshot a specific item with optional specific camera settings (format has to be the same as in the config.json).
+Utilize the command `/customscreenshot` to capture a specific clothing item, with optional custom camera settings specified in the format outlined in `config.json`.
 
 `/customscreenshot [component] [drawable/all] [props/clothing] [male/female/both] [camerasettings(optional)]`
 
@@ -55,13 +53,27 @@ Use the command `/customscreenshot`, that allows you to screenshot a specific it
 
 
 ### Screenshot objects/props
-For screenshoting objects you can use the command `/screenshotobject [hash]`.
+To screenshot objects or props, employ the command `/screenshotobject [hash]`.
+
+Example Usage:
+`/screenshotobject 2240524752`
+
+### Screenshot vehicles
+Capture screenshots of vehicles using `/screenshotvehicle [model/all]`.
+
+Example Usage:
+`/screenshotvehicle all`
+
+`/screenshotvehicle zentorno`
 
 ## Examples
 <img src="https://i.imgur.com/2WJyGgy.png" width="200"> <img src="https://i.imgur.com/aAQwU4d.png" width="200">
 <img src="https://i.imgur.com/EqY5Inu.png" width="200"> <img src="https://i.imgur.com/ctTF9M9.png" width="200">
+<img src="https://i.imgur.com/6qD7hF3.png" width="200"> <img src="https://i.imgur.com/xdMyGyk.png" width="200">
 
 ## Support
-Discord **ben.001**
+For assistance or further inquiries, you can reach me on Discord **ben.001**.
 
-## If you want to support me use [ko-fi](https://ko-fi.com/bentix)❤️​.
+## Support the Project
+If you wish to support this project, consider buying me a coffee on [ko-fi](https://ko-fi.com/bentix). Your support is greatly appreciated! ❤️​
+

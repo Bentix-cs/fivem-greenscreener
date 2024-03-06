@@ -51,7 +51,7 @@ async function takeScreenshotForComponent(pedType, type, component, drawable, te
 
 	SetEntityHeading(ped, camInfo.rotation.z);
 
-	emitNet('takeScreenshot', `${pedType}_${type == 'PROPS' ? 'prop_' : ''}${component}_${drawable}${texture ? `_${texture}`: ''}`);
+	emitNet('takeScreenshot', `${pedType}_${type == 'PROPS' ? 'prop_' : ''}${component}_${drawable}${texture ? `_${texture}`: ''}`, 'clothing');
 	await Delay(2000);
 	return;
 }
@@ -102,7 +102,56 @@ async function takeScreenshotForObject(object, hash) {
 
 	await Delay(50);
 
-	emitNet('takeScreenshot', `${hash}`);
+	emitNet('takeScreenshot', `${hash}`, 'objects');
+
+	await Delay(2000);
+
+	return;
+
+}
+
+async function takeScreenshotForVehicle(vehicle, hash, model) {
+	setWeatherTime();
+
+	await Delay(500);
+
+	if (cam) {
+		DestroyAllCams(true);
+		DestroyCam(cam, true);
+		cam = null;
+	}
+
+	let [[minDimX, minDimY, minDimZ], [maxDimX, maxDimY, maxDimZ]] = GetModelDimensions(hash);
+	let modelSize = {
+		x: maxDimX - minDimX,
+		y: maxDimY - minDimY,
+		z: maxDimZ - minDimZ
+	}
+	let fov = Math.min(Math.max(modelSize.x, modelSize.y, modelSize.z) / 0.15 * 10, 60);
+
+	const [objectX, objectY, objectZ] = GetEntityCoords(vehicle, false);
+
+	const center = {
+		x: objectX + (minDimX + maxDimX) / 2,
+		y: objectY + (minDimY + maxDimY) / 2,
+		z: objectZ + (minDimZ + maxDimZ) / 2,
+	}
+
+	let camPos = {
+		x: center.x + (Math.max(modelSize.x, modelSize.y, modelSize.z) + 2) * Math.cos(340),
+		y: center.y + (Math.max(modelSize.x, modelSize.y, modelSize.z) + 2) * Math.sin(340),
+		z: center.z + modelSize.z / 2,
+	}
+
+	cam = CreateCamWithParams('DEFAULT_SCRIPTED_CAMERA', camPos.x, camPos.y, camPos.z, 0, 0, 0, fov, true, 0);
+
+	PointCamAtCoord(cam, center.x, center.y, center.z);
+	SetCamActive(cam, true);
+	RenderScriptCams(true, false, 0, true, false, 0);
+
+	await Delay(50);
+
+	emitNet('takeScreenshot', `${model}`, 'vehicles');
 
 	await Delay(2000);
 
@@ -525,7 +574,7 @@ RegisterCommand('screenshotobject', async (source, args) => {
 			}
 		}
 
-		SetEntityCoordsNoOffset(ped, config.greenScreenPosition.x, config.greenScreenPosition.y - 2, config.greenScreenPosition.z - 2, false, false, false);
+		SetEntityCoords(ped, config.greenScreenHiddenSpot.x, config.greenScreenHiddenSpot.y, config.greenScreenHiddenSpot.z, false, false, false);
 
 		SetPlayerControl(playerId, false);
 
@@ -553,6 +602,124 @@ RegisterCommand('screenshotobject', async (source, args) => {
 	};
 });
 
+RegisterCommand('screenshotvehicle', async (source, args) => {
+	const vehicles = GetAllVehicleModels();
+	const ped = PlayerPedId();
+	const type = args[0].toLowerCase();
+
+	if (!stopWeatherResource()) return;
+
+
+	DisableIdleCamera(true);
+	SetEntityCoords(ped, config.greenScreenHiddenSpot.x, config.greenScreenHiddenSpot.y, config.greenScreenHiddenSpot.z, false, false, false);
+	SetPlayerControl(playerId, false);
+
+	await Delay(100);
+
+	if (type === 'all') {
+		SendNUIMessage({
+			start: true,
+		});
+		for (const vehicleModel of vehicles) {
+			const vehicleHash = GetHashKey(vehicleModel);
+			if (IsModelValid(vehicleHash)) {
+				if (!HasModelLoaded(vehicleHash)) {
+					RequestModel(vehicleHash);
+					while (!HasModelLoaded(vehicleHash)) {
+						await Delay(100);
+					}
+				}
+
+				const vehicleClass = GetVehicleClassFromName(vehicleHash);
+
+				if (!config.includedVehicleClasses[vehicleClass]) {
+					SetModelAsNoLongerNeeded(vehicleHash);
+					continue;
+				}
+
+				SendNUIMessage({
+					type: vehicleModel,
+					value: vehicles.indexOf(vehicleModel) + 1,
+					max: vehicles.length + 1
+				});
+
+				const vehicle = CreateVehicle(vehicleHash, config.greenScreenVehiclePosition.x, config.greenScreenVehiclePosition.y, config.greenScreenVehiclePosition.z, 0, true, true);
+
+				if (vehicle === 0 || vehicle === null) {
+					SetModelAsNoLongerNeeded(vehicleHash);
+					continue;
+				}
+
+				SetEntityRotation(vehicle, config.greenScreenVehicleRotation.x, config.greenScreenVehicleRotation.y, config.greenScreenVehicleRotation.z, 0, false);
+
+				FreezeEntityPosition(vehicle, true);
+
+				SetVehicleWindowTint(vehicle, 1);
+
+				SetVehicleColours(vehicle, 12, 12)
+
+				await Delay(50);
+
+				await takeScreenshotForVehicle(vehicle, vehicleHash, vehicleModel);
+
+				DeleteEntity(vehicle);
+				SetModelAsNoLongerNeeded(vehicleHash);
+			}
+		}
+		SendNUIMessage({
+			end: true,
+		});
+	} else {
+		const vehicleModel = type;
+		const vehicleHash = GetHashKey(vehicleModel);
+		if (IsModelValid(vehicleHash)) {
+			if (!HasModelLoaded(vehicleHash)) {
+				RequestModel(vehicleHash);
+				while (!HasModelLoaded(vehicleHash)) {
+					await Delay(100);
+				}
+			}
+
+
+			SendNUIMessage({
+				type: vehicleModel,
+				value: vehicles.indexOf(vehicleModel) + 1,
+				max: vehicles.length + 1
+			});
+
+			const vehicle = CreateVehicle(vehicleHash, config.greenScreenVehiclePosition.x, config.greenScreenVehiclePosition.y, config.greenScreenVehiclePosition.z, 0, true, true);
+
+			if (vehicle === 0 || vehicle === null) {
+				SetModelAsNoLongerNeeded(vehicleHash);
+				console.log('ERROR: Could not spawn vehicle.');
+				return;
+			}
+
+			SetEntityRotation(vehicle, config.greenScreenVehicleRotation.x, config.greenScreenVehicleRotation.y, config.greenScreenVehicleRotation.z, 0, false);
+
+			FreezeEntityPosition(vehicle, true);
+
+			SetVehicleWindowTint(vehicle, 1);
+
+			await Delay(50);
+
+			await takeScreenshotForVehicle(vehicle, vehicleHash, vehicleModel);
+
+			DeleteEntity(vehicle);
+			SetModelAsNoLongerNeeded(vehicleHash);
+		} else {
+			console.log('ERROR: Invalid vehicle model');
+		}
+	}
+	SetPlayerControl(playerId, true);
+	startWeatherResource();
+	DestroyAllCams(true);
+	DestroyCam(cam, true);
+	RenderScriptCams(false, false, 0, true, false, 0);
+	cam = null;
+});
+
+
 setImmediate(() => {
 	emit('chat:addSuggestions', [
 		{
@@ -577,6 +744,13 @@ setImmediate(() => {
 				{name:"object", help:"The object hash to take a screenshot of"},
 			]
 		},
+		{
+			name: '/screenshotvehicle',
+			help: 'generate vehicle screenshots',
+			params: [
+				{name:"model/all", help:"The vehicle model or 'all' to take a screenshot of all vehicles"},
+			]
+		}
 	])
   });
 
