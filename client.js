@@ -385,7 +385,7 @@ RegisterCommand('customscreenshot', async (source, args) => {
 	}
 
 	if (args[4] != null) {
-		for (let i = 3; i < args.length; i++) {
+		for (let i = 4; i < args.length; i++) {
 			cameraSettings += args[i] + ' ';
 		}
 
@@ -622,49 +622,49 @@ RegisterCommand('screenshotvehicle', async (source, args) => {
 		});
 		for (const vehicleModel of vehicles) {
 			const vehicleHash = GetHashKey(vehicleModel);
-			if (IsModelValid(vehicleHash)) {
-				if (!HasModelLoaded(vehicleHash)) {
-					RequestModel(vehicleHash);
-					while (!HasModelLoaded(vehicleHash)) {
-						await Delay(100);
-					}
+			if (!IsModelValid(vehicleHash)) continue;
+
+			if (!HasModelLoaded(vehicleHash)) {
+				RequestModel(vehicleHash);
+				while (!HasModelLoaded(vehicleHash)) {
+					await Delay(100);
 				}
-
-				const vehicleClass = GetVehicleClassFromName(vehicleHash);
-
-				if (!config.includedVehicleClasses[vehicleClass]) {
-					SetModelAsNoLongerNeeded(vehicleHash);
-					continue;
-				}
-
-				SendNUIMessage({
-					type: vehicleModel,
-					value: vehicles.indexOf(vehicleModel) + 1,
-					max: vehicles.length + 1
-				});
-
-				const vehicle = CreateVehicle(vehicleHash, config.greenScreenVehiclePosition.x, config.greenScreenVehiclePosition.y, config.greenScreenVehiclePosition.z, 0, true, true);
-
-				if (vehicle === 0 || vehicle === null) {
-					SetModelAsNoLongerNeeded(vehicleHash);
-					continue;
-				}
-
-				SetEntityRotation(vehicle, config.greenScreenVehicleRotation.x, config.greenScreenVehicleRotation.y, config.greenScreenVehicleRotation.z, 0, false);
-
-				FreezeEntityPosition(vehicle, true);
-
-				SetVehicleWindowTint(vehicle, 1);
-
-				SetVehicleColours(vehicle, 12, 12)
-
-				await Delay(50);
-
-				await takeScreenshotForVehicle(vehicle, vehicleHash, vehicleModel);
-
-				DeleteEntity(vehicle);
-				SetModelAsNoLongerNeeded(vehicleHash);
 			}
+
+			const vehicleClass = GetVehicleClassFromName(vehicleHash);
+
+			if (!config.includedVehicleClasses[vehicleClass]) {
+				SetModelAsNoLongerNeeded(vehicleHash);
+				continue;
+			}
+
+			SendNUIMessage({
+				type: vehicleModel,
+				value: vehicles.indexOf(vehicleModel) + 1,
+				max: vehicles.length + 1
+			});
+
+			const vehicle = CreateVehicle(vehicleHash, config.greenScreenVehiclePosition.x, config.greenScreenVehiclePosition.y, config.greenScreenVehiclePosition.z, 0, true, true);
+
+			if (vehicle === 0 || vehicle === null) {
+				SetModelAsNoLongerNeeded(vehicleHash);
+				continue;
+			}
+
+			SetEntityRotation(vehicle, config.greenScreenVehicleRotation.x, config.greenScreenVehicleRotation.y, config.greenScreenVehicleRotation.z, 0, false);
+
+			FreezeEntityPosition(vehicle, true);
+
+			SetVehicleWindowTint(vehicle, 1);
+
+			SetVehicleColours(vehicle, 12, 12)
+
+			await Delay(50);
+
+			await takeScreenshotForVehicle(vehicle, vehicleHash, vehicleModel);
+
+			DeleteEntity(vehicle);
+			SetModelAsNoLongerNeeded(vehicleHash);
 		}
 		SendNUIMessage({
 			end: true,
