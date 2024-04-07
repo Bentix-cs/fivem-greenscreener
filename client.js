@@ -9,6 +9,11 @@ let camInfo;
 let ped;
 let interval;
 const playerId = PlayerId();
+let QBCore = null;
+
+if (config.useQBVehicles) {
+	QBCore = exports[config.coreResourceName].GetCoreObject();
+}
 
 async function takeScreenshotForComponent(pedType, type, component, drawable, texture, cameraSettings) {
 	const cameraInfo = cameraSettings ? cameraSettings : config.cameraSettings[type][component];
@@ -49,7 +54,7 @@ async function takeScreenshotForComponent(pedType, type, component, drawable, te
 
 	await Delay(50);
 
-	SetEntityHeading(ped, camInfo.rotation.z);
+	SetEntityRotation(ped, camInfo.rotation.x, camInfo.rotation.y, camInfo.rotation.z, 2, false);
 
 	emitNet('takeScreenshot', `${pedType}_${type == 'PROPS' ? 'prop_' : ''}${component}_${drawable}${texture ? `_${texture}`: ''}`, 'clothing');
 	await Delay(2000);
@@ -556,8 +561,12 @@ RegisterCommand('customscreenshot', async (source, args) => {
 });
 
 RegisterCommand('screenshotobject', async (source, args) => {
-	const modelHash = Number(args[0]);
+	let modelHash = isNaN(Number(args[0])) ? GetHashKey(args[0]) : Number(args[0]);
 	const ped = GetPlayerPed(-1);
+
+	if (IsWeaponValid(modelHash)) {
+		modelHash = GetWeapontypeModel(modelHash);
+	}
 
 	if (!stopWeatherResource()) return;
 
@@ -573,37 +582,39 @@ RegisterCommand('screenshotobject', async (source, args) => {
 				await Delay(100);
 			}
 		}
-
-		SetEntityCoords(ped, config.greenScreenHiddenSpot.x, config.greenScreenHiddenSpot.y, config.greenScreenHiddenSpot.z, false, false, false);
-
-		SetPlayerControl(playerId, false);
-
-		const object = CreateObjectNoOffset(modelHash, config.greenScreenPosition.x, config.greenScreenPosition.y, config.greenScreenPosition.z, false, true, true);
-
-		SetEntityRotation(object, config.greenScreenRotation.x, config.greenScreenRotation.y, config.greenScreenRotation.z, 0, false);
-
-		FreezeEntityPosition(object, true);
-
-		await Delay(50);
-
-		await takeScreenshotForObject(object, modelHash);
+	} else {
+		console.log('ERROR: Invalid object model');
+		return;
+	}
 
 
-		DeleteEntity(object);
-		SetPlayerControl(playerId, true);
-		SetModelAsNoLongerNeeded(modelHash);
-		startWeatherResource();
-		DestroyAllCams(true);
-		DestroyCam(cam, true);
-		RenderScriptCams(false, false, 0, true, false, 0);
-		cam = null;
+	SetEntityCoords(ped, config.greenScreenHiddenSpot.x, config.greenScreenHiddenSpot.y, config.greenScreenHiddenSpot.z, false, false, false);
+
+	SetPlayerControl(playerId, false);
+
+	const object = CreateObjectNoOffset(modelHash, config.greenScreenPosition.x, config.greenScreenPosition.y, config.greenScreenPosition.z, false, true, true);
+
+	SetEntityRotation(object, config.greenScreenRotation.x, config.greenScreenRotation.y, config.greenScreenRotation.z, 0, false);
+
+	FreezeEntityPosition(object, true);
+
+	await Delay(50);
+
+	await takeScreenshotForObject(object, modelHash);
 
 
-	};
+	DeleteEntity(object);
+	SetPlayerControl(playerId, true);
+	SetModelAsNoLongerNeeded(modelHash);
+	startWeatherResource();
+	DestroyAllCams(true);
+	DestroyCam(cam, true);
+	RenderScriptCams(false, false, 0, true, false, 0);
+	cam = null;
 });
 
 RegisterCommand('screenshotvehicle', async (source, args) => {
-	const vehicles = GetAllVehicleModels();
+	const vehicles = (config.useQBVehicles && QBCore != null) ? Object.keys(QBCore.Shared.Vehicles) : GetAllVehicleModels();
 	const ped = PlayerPedId();
 	const type = args[0].toLowerCase();
 
@@ -621,6 +632,9 @@ RegisterCommand('screenshotvehicle', async (source, args) => {
 			start: true,
 		});
 		for (const vehicleModel of vehicles) {
+			const timeout = setTimeout(() => {
+
+			}, config.vehicleSpawnTimeout)
 			const vehicleHash = GetHashKey(vehicleModel);
 			if (!IsModelValid(vehicleHash)) continue;
 
@@ -644,10 +658,11 @@ RegisterCommand('screenshotvehicle', async (source, args) => {
 				max: vehicles.length + 1
 			});
 
-			const vehicle = CreateVehicle(vehicleHash, config.greenScreenVehiclePosition.x, config.greenScreenVehiclePosition.y, config.greenScreenVehiclePosition.z, 0, true, true);
+			const vehicle = await createGreenScreenVehicle(vehicleHash);
 
 			if (vehicle === 0 || vehicle === null) {
 				SetModelAsNoLongerNeeded(vehicleHash);
+				console.log(`ERROR: Could not spawn vehicle. Broken Vehicle: ${vehicleModel}`);
 				continue;
 			}
 
@@ -656,8 +671,6 @@ RegisterCommand('screenshotvehicle', async (source, args) => {
 			FreezeEntityPosition(vehicle, true);
 
 			SetVehicleWindowTint(vehicle, 1);
-
-			SetVehicleColours(vehicle, 12, 12)
 
 			await Delay(50);
 
@@ -687,11 +700,11 @@ RegisterCommand('screenshotvehicle', async (source, args) => {
 				max: vehicles.length + 1
 			});
 
-			const vehicle = CreateVehicle(vehicleHash, config.greenScreenVehiclePosition.x, config.greenScreenVehiclePosition.y, config.greenScreenVehiclePosition.z, 0, true, true);
+			const vehicle = await createGreenScreenVehicle(vehicleHash);
 
 			if (vehicle === 0 || vehicle === null) {
 				SetModelAsNoLongerNeeded(vehicleHash);
-				console.log('ERROR: Could not spawn vehicle.');
+				console.log(`ERROR: Could not spawn vehicle. Broken Vehicle: ${vehicleModel}`);
 				return;
 			}
 
@@ -718,6 +731,21 @@ RegisterCommand('screenshotvehicle', async (source, args) => {
 	RenderScriptCams(false, false, 0, true, false, 0);
 	cam = null;
 });
+
+function createGreenScreenVehicle(vehicleModel) {
+	return new Promise(async(resolve, reject) => {
+		const timeout = setTimeout(() => {
+			resolve(null);
+		}, config.vehicleSpawnTimeout)
+		const vehicle = CreateVehicle(vehicleModel, config.greenScreenVehiclePosition.x, config.greenScreenVehiclePosition.y, config.greenScreenVehiclePosition.z, 0, true, true);
+		if (vehicle === 0) {
+			clearTimeout(timeout);
+			resolve(null);
+		}
+		clearTimeout(timeout);
+		resolve(vehicle);
+	});
+}
 
 
 setImmediate(() => {

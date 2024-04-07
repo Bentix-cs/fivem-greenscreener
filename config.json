@@ -1,6 +1,9 @@
 {
   "includeTextures": false,
   "//__comment__//": "The image generation will take much longer and you will have much more images!",
+  "useQBVehicles": true,
+  "coreResourceName": "qb-core",
+  "//__comment__//.": "If you want to use the QB Vehicles in the vehicles.lua file, set this to true. QBCore has to be installed and started before this script!",
   "includedVehicleClasses": {
     "0": true,
     "1": true,
@@ -26,7 +29,9 @@
     "21": false,
     "22": false
   },
-  "//__comment__//.": "The classes that will be included in the image generation. See https://docs.fivem.net/natives/?_0x29439776AAA00A62",
+  "//__comment__//..": "The classes that will be included in the image generation. See https://docs.fivem.net/natives/?_0x29439776AAA00A62",
+  "vehicleSpawnTimeout": 5000,
+  "//__comment__//...": "The time in milliseconds that the script will wait before spawning the next vehicle.",
   "cameraSettings": {
     "CLOTHING": {
       "1": {
