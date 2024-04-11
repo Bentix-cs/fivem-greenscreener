@@ -5,7 +5,7 @@ You can use them for example in your inventory, clothing store or vehicle store.
 
 ## Using the images
 You are granted the freedom to utilize the images in your open-source projects with proper accreditation.
-For commercial usage, please reach out to me on Discord to discuss pricing and conditions.
+For commercial usage, please reach out to me on Discord to discuss the conditions.
 
 ## Services Offered
 For a fee, I offer a service where I generate the images for you. You can also send me your custom clothing, vehicles or props, and I will include them.
