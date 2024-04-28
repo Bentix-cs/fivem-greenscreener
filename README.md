@@ -59,12 +59,12 @@ Example Usage:
 `/screenshotobject 2240524752`
 
 ### Screenshot vehicles
-Capture screenshots of vehicles using `/screenshotvehicle [model/all]`.
+Capture screenshots of vehicles using `/screenshotvehicle [model/all] [primarycolor(optional)] [secondarycolor(optional)]`.
 
 Example Usage:
-`/screenshotvehicle all`
+`/screenshotvehicle all 1 1`
 
-`/screenshotvehicle zentorno`
+`/screenshotvehicle zentorno 1 1`
 
 ## Examples
 <img src="https://i.imgur.com/2WJyGgy.png" width="200"> <img src="https://i.imgur.com/aAQwU4d.png" width="200">
