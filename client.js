@@ -179,6 +179,8 @@ function ClearAllPedProps() {
 
 async function ResetPedComponents() {
 
+	if (config.debug) console.log(`DEBUG: Resetting Ped Components`);
+
 	SetPedDefaultComponentVariation(ped);
 
 	await Delay(150);
@@ -202,6 +204,7 @@ async function ResetPedComponents() {
 }
 
 function setWeatherTime() {
+	if (config.debug) console.log(`DEBUG: Setting Weather & Time`);
 	SetRainLevel(0.0);
 	SetWeatherTypePersist('EXTRASUNNY');
 	SetWeatherTypeNow('EXTRASUNNY');
@@ -211,6 +214,7 @@ function setWeatherTime() {
 }
 
 function stopWeatherResource() {
+	if (config.debug) console.log(`DEBUG: Stopping Weather Resource`);
 	if ((GetResourceState('qb-weathersync') == 'started') || (GetResourceState('qbx_weathersync') == 'started')) {
 		TriggerEvent('qb-weathersync:client:DisableSync');
 		return true;
@@ -233,6 +237,7 @@ function stopWeatherResource() {
 };
 
 function startWeatherResource() {
+	if (config.debug) console.log(`DEBUG: Starting Weather Resource again`);
 	if ((GetResourceState('qb-weathersync') == 'started') || (GetResourceState('qbx_weathersync') == 'started')) {
 		TriggerEvent('qb-weathersync:client:EnableSync');
 	} else if (GetResourceState('weathersync') == 'started') {
@@ -243,6 +248,54 @@ function startWeatherResource() {
 		TriggerEvent('vSync:toggle', true)
 	}
 }
+
+async function LoadComponentVariation(ped, component, drawable, texture) {
+	texture = texture || 0;
+
+	if (config.debug) console.log(`DEBUG: Loading Component Variation: ${component} ${drawable} ${texture}`);
+
+	SetPedPreloadVariationData(ped, component, drawable, 0);
+	while (!HasPedPreloadVariationDataFinished(ped)) {
+		await Delay(50);
+	}
+	SetPedComponentVariation(ped, component, drawable, 0, 0);
+}
+
+async function LoadPropVariation(ped, component, prop, texture) {
+	texture = texture || 0;
+
+	if (config.debug) console.log(`DEBUG: Loading Prop Variation: ${component} ${prop} ${texture}`);
+
+	SetPedPreloadPropData(ped, component, prop, texture);
+	while (!HasPedPreloadPropDataFinished(ped)) {
+		await Delay(50);
+	}
+	ClearPedProp(ped, component);
+	SetPedPropIndex(ped, component, prop, texture, 0);
+}
+
+function createGreenScreenVehicle(vehicleHash, vehicleModel) {
+	return new Promise(async(resolve, reject) => {
+		if (config.debug) console.log(`DEBUG: Spawning Vehicle ${vehicleModel}`);
+		const timeout = setTimeout(() => {
+			resolve(null);
+		}, config.vehicleSpawnTimeout)
+		if (!HasModelLoaded(vehicleHash)) {
+			RequestModel(vehicleHash);
+			while (!HasModelLoaded(vehicleHash)) {
+				await Delay(100);
+			}
+		}
+		const vehicle = CreateVehicle(vehicleHash, config.greenScreenVehiclePosition.x, config.greenScreenVehiclePosition.y, config.greenScreenVehiclePosition.z, 0, true, true);
+		if (vehicle === 0) {
+			clearTimeout(timeout);
+			resolve(null);
+		}
+		clearTimeout(timeout);
+		resolve(vehicle);
+	});
+}
+
 
 RegisterCommand('screenshot', async (source, args) => {
 	const modelHashes = [GetHashKey('mp_m_freemode_01'), GetHashKey('mp_f_freemode_01')];
@@ -302,19 +355,11 @@ RegisterCommand('screenshot', async (source, args) => {
 							});
 							if (config.includeTextures) {
 								for (let texture = 0; texture < textureVariationCount; texture++) {
-									SetPedPreloadVariationData(ped, component, drawable, texture);
-									while (!HasPedPreloadVariationDataFinished(ped)) {
-										await Delay(50);
-									}
-									SetPedComponentVariation(ped, component, drawable, texture, 0);
+									await LoadComponentVariation(ped, component, drawable, texture);
 									await takeScreenshotForComponent(pedType, type, component, drawable, texture);
 								}
 							} else {
-								SetPedPreloadVariationData(ped, component, drawable, 0);
-								while (!HasPedPreloadVariationDataFinished(ped)) {
-									await Delay(50);
-								}
-								SetPedComponentVariation(ped, component, drawable, 0, 0);
+								await LoadComponentVariation(ped, component, drawable);
 								await takeScreenshotForComponent(pedType, type, component, drawable);
 							}
 						}
@@ -330,21 +375,11 @@ RegisterCommand('screenshot', async (source, args) => {
 
 							if (config.includeTextures) {
 								for (let texture = 0; texture < textureVariationCount; texture++) {
-									SetPedPreloadPropData(ped, component, drawable, texture);
-									while (!HasPedPreloadPropDataFinished(ped)) {
-										await Delay(50);
-									}
-									ClearPedProp(ped, component);
-									SetPedPropIndex(ped, component, prop, texture, 0);
+									await LoadPropVariation(ped, component, prop, texture);
 									await takeScreenshotForComponent(pedType, type, component, prop, texture);
 								}
 							} else {
-								SetPedPreloadPropData(ped, component, prop, 0);
-								while (!HasPedPreloadPropDataFinished(ped)) {
-									await Delay(50);
-								}
-								ClearPedProp(ped, component);
-								SetPedPropIndex(ped, component, prop, 0, 0);
+								await LoadPropVariation(ped, component, prop);
 								await takeScreenshotForComponent(pedType, type, component, prop);
 							}
 						}
@@ -451,19 +486,11 @@ RegisterCommand('customscreenshot', async (source, args) => {
 						});
 						if (config.includeTextures) {
 							for (let texture = 0; texture < textureVariationCount; texture++) {
-								SetPedPreloadVariationData(ped, component, drawable, texture);
-								while (!HasPedPreloadVariationDataFinished(ped)) {
-									await Delay(50);
-								}
-								SetPedComponentVariation(ped, component, drawable, texture, 0);
+								await LoadComponentVariation(ped, component, drawable, texture);
 								await takeScreenshotForComponent(pedType, type, component, drawable, texture, cameraSettings);
 							}
 						} else {
-							SetPedPreloadVariationData(ped, component, drawable, 0);
-							while (!HasPedPreloadVariationDataFinished(ped)) {
-								await Delay(50);
-							}
-							SetPedComponentVariation(ped, component, drawable, 0, 0);
+							await LoadComponentVariation(ped, component, drawable);
 							await takeScreenshotForComponent(pedType, type, component, drawable, null, cameraSettings);
 						}
 					}
@@ -479,21 +506,11 @@ RegisterCommand('customscreenshot', async (source, args) => {
 
 						if (config.includeTextures) {
 							for (let texture = 0; texture < textureVariationCount; texture++) {
-								SetPedPreloadPropData(ped, component, drawable, texture);
-								while (!HasPedPreloadPropDataFinished(ped)) {
-									await Delay(50);
-								}
-								ClearPedProp(ped, component);
-								SetPedPropIndex(ped, component, prop, texture, 0);
+								await LoadPropVariation(ped, component, prop, texture);
 								await takeScreenshotForComponent(pedType, type, component, prop, texture, cameraSettings);
 							}
 						} else {
-							SetPedPreloadPropData(ped, component, drawable, 0);
-								while (!HasPedPreloadPropDataFinished(ped)) {
-									await Delay(50);
-								}
-							ClearPedProp(ped, component);
-							SetPedPropIndex(ped, component, prop, 0, 0);
+							await LoadPropVariation(ped, component, prop);
 							await takeScreenshotForComponent(pedType, type, component, prop, null, cameraSettings);
 						}
 					}
@@ -504,19 +521,11 @@ RegisterCommand('customscreenshot', async (source, args) => {
 
 					if (config.includeTextures) {
 						for (let texture = 0; texture < textureVariationCount; texture++) {
-							SetPedPreloadVariationData(ped, component, drawable, texture);
-							while (!HasPedPreloadVariationDataFinished(ped)) {
-								await Delay(50);
-							}
-							SetPedComponentVariation(ped, component, drawable, texture, 0);
+							await LoadComponentVariation(ped, component, drawable, texture);
 							await takeScreenshotForComponent(pedType, type, component, drawable, texture, cameraSettings);
 						}
 					} else {
-						SetPedPreloadVariationData(ped, component, drawable, 0);
-						while (!HasPedPreloadVariationDataFinished(ped)) {
-							await Delay(50);
-						}
-						SetPedComponentVariation(ped, component, drawable, 0, 0);
+						await LoadComponentVariation(ped, component, drawable);
 						await takeScreenshotForComponent(pedType, type, component, drawable, null, cameraSettings);
 					}
 				} else if (type === 'PROPS') {
@@ -524,21 +533,11 @@ RegisterCommand('customscreenshot', async (source, args) => {
 
 					if (config.includeTextures) {
 						for (let texture = 0; texture < textureVariationCount; texture++) {
-							SetPedPreloadPropData(ped, component, drawable, texture);
-							while (!HasPedPreloadPropDataFinished(ped)) {
-								await Delay(50);
-							}
-							ClearPedProp(ped, component);
-							SetPedPropIndex(ped, component, prop, texture, 0);
+							await LoadPropVariation(ped, component, prop, texture);
 							await takeScreenshotForComponent(pedType, type, component, prop, texture, cameraSettings);
 						}
 					} else {
-						SetPedPreloadPropData(ped, component, drawable, 0);
-						while (!HasPedPreloadPropDataFinished(ped)) {
-							await Delay(50);
-						}
-						ClearPedProp(ped, component);
-						SetPedPropIndex(ped, component, prop, 0, 0);
+						await LoadPropVariation(ped, component, prop);
 						await takeScreenshotForComponent(pedType, type, component, prop, null, cameraSettings);
 					}
 				}
@@ -592,6 +591,8 @@ RegisterCommand('screenshotobject', async (source, args) => {
 
 	SetPlayerControl(playerId, false);
 
+	if (config.debug) console.log(`DEBUG: Spawning Object ${modelHash}`);
+
 	const object = CreateObjectNoOffset(modelHash, config.greenScreenPosition.x, config.greenScreenPosition.y, config.greenScreenPosition.z, false, true, true);
 
 	SetEntityRotation(object, config.greenScreenRotation.x, config.greenScreenRotation.y, config.greenScreenRotation.z, 0, false);
@@ -617,6 +618,8 @@ RegisterCommand('screenshotvehicle', async (source, args) => {
 	const vehicles = (config.useQBVehicles && QBCore != null) ? Object.keys(QBCore.Shared.Vehicles) : GetAllVehicleModels();
 	const ped = PlayerPedId();
 	const type = args[0].toLowerCase();
+	const primarycolor = args[1] ? parseInt(args[1]) : null;
+	const secondarycolor = args[2] ? parseInt(args[2]) : null;
 
 	if (!stopWeatherResource()) return;
 
@@ -625,6 +628,8 @@ RegisterCommand('screenshotvehicle', async (source, args) => {
 	SetEntityCoords(ped, config.greenScreenHiddenSpot.x, config.greenScreenHiddenSpot.y, config.greenScreenHiddenSpot.z, false, false, false);
 	SetPlayerControl(playerId, false);
 
+	ClearAreaOfVehicles(config.greenScreenPosition.x, config.greenScreenPosition.y, config.greenScreenPosition.z, 10, false, false, false, false, false);
+
 	await Delay(100);
 
 	if (type === 'all') {
@@ -632,18 +637,9 @@ RegisterCommand('screenshotvehicle', async (source, args) => {
 			start: true,
 		});
 		for (const vehicleModel of vehicles) {
-			const timeout = setTimeout(() => {
-
-			}, config.vehicleSpawnTimeout)
 			const vehicleHash = GetHashKey(vehicleModel);
 			if (!IsModelValid(vehicleHash)) continue;
 
-			if (!HasModelLoaded(vehicleHash)) {
-				RequestModel(vehicleHash);
-				while (!HasModelLoaded(vehicleHash)) {
-					await Delay(100);
-				}
-			}
 
 			const vehicleClass = GetVehicleClassFromName(vehicleHash);
 
@@ -658,7 +654,7 @@ RegisterCommand('screenshotvehicle', async (source, args) => {
 				max: vehicles.length + 1
 			});
 
-			const vehicle = await createGreenScreenVehicle(vehicleHash);
+			const vehicle = await createGreenScreenVehicle(vehicleHash, vehicleModel);
 
 			if (vehicle === 0 || vehicle === null) {
 				SetModelAsNoLongerNeeded(vehicleHash);
@@ -671,6 +667,8 @@ RegisterCommand('screenshotvehicle', async (source, args) => {
 			FreezeEntityPosition(vehicle, true);
 
 			SetVehicleWindowTint(vehicle, 1);
+
+			if (primarycolor) SetVehicleColours(vehicle, primarycolor, secondarycolor || primarycolor);
 
 			await Delay(50);
 
@@ -686,12 +684,7 @@ RegisterCommand('screenshotvehicle', async (source, args) => {
 		const vehicleModel = type;
 		const vehicleHash = GetHashKey(vehicleModel);
 		if (IsModelValid(vehicleHash)) {
-			if (!HasModelLoaded(vehicleHash)) {
-				RequestModel(vehicleHash);
-				while (!HasModelLoaded(vehicleHash)) {
-					await Delay(100);
-				}
-			}
+
 
 
 			SendNUIMessage({
@@ -700,7 +693,7 @@ RegisterCommand('screenshotvehicle', async (source, args) => {
 				max: vehicles.length + 1
 			});
 
-			const vehicle = await createGreenScreenVehicle(vehicleHash);
+			const vehicle = await createGreenScreenVehicle(vehicleHash, vehicleModel);
 
 			if (vehicle === 0 || vehicle === null) {
 				SetModelAsNoLongerNeeded(vehicleHash);
@@ -713,6 +706,8 @@ RegisterCommand('screenshotvehicle', async (source, args) => {
 			FreezeEntityPosition(vehicle, true);
 
 			SetVehicleWindowTint(vehicle, 1);
+
+			if (primarycolor) SetVehicleColours(vehicle, primarycolor, secondarycolor || primarycolor);
 
 			await Delay(50);
 
@@ -732,20 +727,6 @@ RegisterCommand('screenshotvehicle', async (source, args) => {
 	cam = null;
 });
 
-function createGreenScreenVehicle(vehicleModel) {
-	return new Promise(async(resolve, reject) => {
-		const timeout = setTimeout(() => {
-			resolve(null);
-		}, config.vehicleSpawnTimeout)
-		const vehicle = CreateVehicle(vehicleModel, config.greenScreenVehiclePosition.x, config.greenScreenVehiclePosition.y, config.greenScreenVehiclePosition.z, 0, true, true);
-		if (vehicle === 0) {
-			clearTimeout(timeout);
-			resolve(null);
-		}
-		clearTimeout(timeout);
-		resolve(vehicle);
-	});
-}
 
 
 setImmediate(() => {
@@ -777,6 +758,8 @@ setImmediate(() => {
 			help: 'generate vehicle screenshots',
 			params: [
 				{name:"model/all", help:"The vehicle model or 'all' to take a screenshot of all vehicles"},
+				{name:"primarycolor", help:"The primary vehicle color to take a screenshot of (optional) See: https://wiki.rage.mp/index.php?title=Vehicle_Colors"},
+				{name:"secondarycolor", help:"The secondary vehicle color to take a screenshot of (optional) See: https://wiki.rage.mp/index.php?title=Vehicle_Colors"},
 			]
 		}
 	])
