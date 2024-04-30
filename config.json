@@ -1,5 +1,5 @@
 {
-  "debug:": false,
+  "debug": false,
   "includeTextures": false,
   "//__comment__//": "The image generation will take much longer and you will have much more images!",
   "useQBVehicles": false,

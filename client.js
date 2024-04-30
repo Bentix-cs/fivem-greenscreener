@@ -254,11 +254,13 @@ async function LoadComponentVariation(ped, component, drawable, texture) {
 
 	if (config.debug) console.log(`DEBUG: Loading Component Variation: ${component} ${drawable} ${texture}`);
 
-	SetPedPreloadVariationData(ped, component, drawable, 0);
+	SetPedPreloadVariationData(ped, component, drawable, texture);
 	while (!HasPedPreloadVariationDataFinished(ped)) {
 		await Delay(50);
 	}
-	SetPedComponentVariation(ped, component, drawable, 0, 0);
+	SetPedComponentVariation(ped, component, drawable, texture, 0);
+
+	return;
 }
 
 async function LoadPropVariation(ped, component, prop, texture) {
@@ -272,6 +274,8 @@ async function LoadPropVariation(ped, component, prop, texture) {
 	}
 	ClearPedProp(ped, component);
 	SetPedPropIndex(ped, component, prop, texture, 0);
+
+	return;
 }
 
 function createGreenScreenVehicle(vehicleHash, vehicleModel) {
