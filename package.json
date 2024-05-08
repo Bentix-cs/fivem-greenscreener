@@ -4,6 +4,7 @@
   "description": "",
   "main": "client.js",
   "scripts": {
+    "preinstall": "ml-regression-exponential",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
@@ -14,5 +15,8 @@
     "@citizenfx/server": "^2.0.6878-1",
     "canvas": "^2.11.2",
     "image-js": "^0.35.5"
+  },
+  "resolutions": {
+    "ml-regression-exponential": "2.1.0"
   }
 }
