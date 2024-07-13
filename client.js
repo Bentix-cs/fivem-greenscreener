@@ -429,6 +429,7 @@ RegisterCommand('customscreenshot', async (source, args) => {
 	}
 
 	if (args[4] != null) {
+		let cameraSettings = ''
 		for (let i = 4; i < args.length; i++) {
 			cameraSettings += args[i] + ' ';
 		}
