@@ -4,10 +4,12 @@ A small script that allows you to take screenshots of every gta clothing, prop/o
 You can use them for example in your inventory, clothing store or vehicle store.
 
 ## Using the images
+
 You are granted the freedom to utilize the images in your open-source projects with proper accreditation.
 For commercial usage, please reach out to me on Discord to discuss the conditions.
 
 ## Key Features
+
 - Capture screenshots of every GTA clothing item, including addon clothing
 - Capture screenshots of all objects and props in GTA, including addon props
 - Capture screenshots of every vehicle in GTA, including addon vehicles
@@ -20,25 +22,30 @@ For commercial usage, please reach out to me on Discord to discuss the condition
 - Utilizes a large greenscreen box (thanks to [@jimgordon20](https://github.com/jimgordon20/jim_g_green_screen))
 
 ## Planned Updates
+
 - Feel free to share any ideas or suggestions for future enhancements!
 
 ## Installation
-**Dependencies**
-- [screenshot-basic](https://github.com/citizenfx/screenshot-basic)
-- yarn
 
-### Step 1
-Simply place the resource in your resources folder.
+Simply clone the repository and place the resource in your resources folder.
 
 **Do not use a subfolder like `resources/[scripts]` as it will cause the script to malfunction.**
 
+## Dependencies
+
+- [screenshot-basic](https://github.com/citizenfx/screenshot-basic)
+- yarn
+
 ## Usage
+
 ### Screenshot all clothing
+
 Execute the command `/screenshot` to initiate the clothing screenshot process.
 Be patient as it may take some time to complete, and it's advisable not to interfere with your PC during this operation.
 
 
 ### Screenshot specific clothing
+
 Utilize the command `/customscreenshot` to capture a specific clothing item, with optional custom camera settings specified in the format outlined in `config.json`.
 
 `/customscreenshot [component] [drawable/all] [props/clothing] [male/female/both] [camerasettings(optional)]`
@@ -49,12 +56,14 @@ Utilize the command `/customscreenshot` to capture a specific clothing item, wit
 
 
 ### Screenshot objects/props
+
 To screenshot objects or props, employ the command `/screenshotobject [hash]`.
 
 Example Usage:
 `/screenshotobject 2240524752`
 
 ### Screenshot vehicles
+
 Capture screenshots of vehicles using `/screenshotvehicle [model/all] [primarycolor(optional)] [secondarycolor(optional)]`.
 
 Example Usage:
@@ -63,10 +72,16 @@ Example Usage:
 `/screenshotvehicle zentorno 1 1`
 
 ## Examples
+
 <img src="https://i.imgur.com/2WJyGgy.png" width="200"> <img src="https://i.imgur.com/aAQwU4d.png" width="200">
 <img src="https://i.imgur.com/EqY5Inu.png" width="200"> <img src="https://i.imgur.com/ctTF9M9.png" width="200">
 <img src="https://i.imgur.com/6qD7hF3.png" width="200"> <img src="https://i.imgur.com/xdMyGyk.png" width="200">
 
+## Support
+
+For support just join my [discord](https://discord.gg/yN96thgggk).
+
 ## Support the Project
+
 If you wish to support this project, consider buying me a coffee on [ko-fi](https://ko-fi.com/bentix). Your support is greatly appreciated! ❤️​
 
