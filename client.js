@@ -15,6 +15,7 @@ const playerId = PlayerId();
 let QBCore = null;
 let capturePaused = false;
 let captureStopRequested = false;
+let captureHudTick = null;
 
 if (config.useQBVehicles) {
 	QBCore = exports[config.coreResourceName].GetCoreObject();
@@ -26,6 +27,28 @@ async function shouldStopCapture() {
 	}
 
 	return captureStopRequested;
+}
+
+function beginCaptureHud() {
+	DisplayRadar(false);
+
+	if (captureHudTick !== null) {
+		clearTick(captureHudTick);
+	}
+
+	captureHudTick = setTick(() => {
+		HideHudAndRadarThisFrame();
+		DisplayRadar(false);
+	});
+}
+
+function endCaptureHud() {
+	if (captureHudTick !== null) {
+		clearTick(captureHudTick);
+		captureHudTick = null;
+	}
+
+	DisplayRadar(true);
 }
 
 async function takeScreenshotForComponent(pedType, type, component, drawable, texture, cameraSettings) {
@@ -331,6 +354,7 @@ RegisterCommand('screenshot', async (source, args) => {
 	if (!stopWeatherResource()) return;
 
 	DisableIdleCamera(true);
+	beginCaptureHud();
 
 
 	await Delay(100);
@@ -433,6 +457,7 @@ RegisterCommand('screenshot', async (source, args) => {
 	RenderScriptCams(false, false, 0, true, false, 0);
 	camInfo = null;
 	cam = null;
+	endCaptureHud();
 });
 
 RegisterCommand('customscreenshot', async (source, args) => {
@@ -470,6 +495,7 @@ RegisterCommand('customscreenshot', async (source, args) => {
 	if (!stopWeatherResource()) return;
 
 	DisableIdleCamera(true);
+	beginCaptureHud();
 
 
 	await Delay(100);
@@ -598,6 +624,7 @@ RegisterCommand('customscreenshot', async (source, args) => {
 	RenderScriptCams(false, false, 0, true, false, 0);
 	camInfo = null;
 	cam = null;
+	endCaptureHud();
 });
 
 RegisterCommand('screenshotobject', async (source, args) => {
@@ -613,6 +640,7 @@ RegisterCommand('screenshotobject', async (source, args) => {
 	if (!stopWeatherResource()) return;
 
 	DisableIdleCamera(true);
+	beginCaptureHud();
 
 
 	await Delay(100);
@@ -655,6 +683,7 @@ RegisterCommand('screenshotobject', async (source, args) => {
 	DestroyCam(cam, true);
 	RenderScriptCams(false, false, 0, true, false, 0);
 	cam = null;
+	endCaptureHud();
 });
 
 RegisterCommand('screenshotvehicle', async (source, args) => {
@@ -670,6 +699,7 @@ RegisterCommand('screenshotvehicle', async (source, args) => {
 
 
 	DisableIdleCamera(true);
+	beginCaptureHud();
 	SetEntityCoords(ped, config.greenScreenHiddenSpot.x, config.greenScreenHiddenSpot.y, config.greenScreenHiddenSpot.z, false, false, false);
 	SetPlayerControl(playerId, false);
 
@@ -744,6 +774,7 @@ RegisterCommand('screenshotvehicle', async (source, args) => {
 			if (vehicle === 0 || vehicle === null) {
 				SetModelAsNoLongerNeeded(vehicleHash);
 				console.log(`ERROR: Could not spawn vehicle. Broken Vehicle: ${vehicleModel}`);
+				endCaptureHud();
 				return;
 			}
 
@@ -771,6 +802,7 @@ RegisterCommand('screenshotvehicle', async (source, args) => {
 	DestroyCam(cam, true);
 	RenderScriptCams(false, false, 0, true, false, 0);
 	cam = null;
+	endCaptureHud();
 });
 
 RegisterCommand('screenshotpause', () => {
@@ -789,6 +821,7 @@ RegisterCommand('screenshotstop', () => {
 	SendNUIMessage({
 		end: true,
 	});
+	endCaptureHud();
 	console.log('Greenscreener capture stop requested.');
 });
 
@@ -847,6 +880,7 @@ on('onResourceStop', (resName) => {
 
 	startWeatherResource();
 	clearInterval(interval);
+	endCaptureHud();
 	SetPlayerControl(playerId, true);
 	FreezeEntityPosition(ped, false);
 });
