@@ -5,19 +5,28 @@ const imagejs = require('image-js');
 const fs = require('fs');
 
 const resName = GetCurrentResourceName();
-const mainSavePath = `resources/${resName}/images`;
 const config = JSON.parse(LoadResourceFile(GetCurrentResourceName(), "config.json"));
+const configuredSavePath = config.outputPathConvar
+	? GetConvar(config.outputPathConvar, '')
+	: '';
+const mainSavePath = configuredSavePath && configuredSavePath.trim().length > 0
+	? configuredSavePath
+	: config.outputPath && config.outputPath.trim().length > 0
+		? config.outputPath
+		: `resources/${resName}/images`;
+
+function ensureDirectory(path) {
+	if (!fs.existsSync(path)) {
+		fs.mkdirSync(path, { recursive: true });
+	}
+}
 
 try {
-	if (!fs.existsSync(mainSavePath)) {
-		fs.mkdirSync(mainSavePath);
-	}
+	ensureDirectory(mainSavePath);
 
 	onNet('takeScreenshot', async (filename, type) => {
 		const savePath = `${mainSavePath}/${type}`;
-		if (!fs.existsSync(savePath)) {
-			fs.mkdirSync(savePath);
-		}
+		ensureDirectory(savePath);
 
 		const fullFilePath = savePath + "/" + filename + ".png";
 

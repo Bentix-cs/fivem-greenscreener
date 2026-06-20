@@ -59,6 +59,8 @@ You can adjust `clothingScreenshotDelay` in `config.json` to control how long th
 
 While a long capture is running, you can use `/screenshotpause` to pause it, `/screenshotresume` to continue it, and `/screenshotstop` to stop it early.
 
+You can set `outputPath` in `config.json`, or override it externally with the convar configured by `outputPathConvar`. By default, the convar name is `fivem_greenscreener_output_path`.
+
 
 ### Screenshot objects/props
 
