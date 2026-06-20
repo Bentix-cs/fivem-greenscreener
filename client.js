@@ -3,6 +3,9 @@
 const config = JSON.parse(LoadResourceFile(GetCurrentResourceName(), 'config.json'));
 
 const Delay = (ms) => new Promise((res) => setTimeout(res, ms));
+const clothingScreenshotDelay = Number.isFinite(Number(config.clothingScreenshotDelay))
+	? Math.max(0, Number(config.clothingScreenshotDelay))
+	: 2000;
 
 let cam;
 let camInfo;
@@ -10,12 +13,24 @@ let ped;
 let interval;
 const playerId = PlayerId();
 let QBCore = null;
+let capturePaused = false;
+let captureStopRequested = false;
 
 if (config.useQBVehicles) {
 	QBCore = exports[config.coreResourceName].GetCoreObject();
 }
 
+async function shouldStopCapture() {
+	while (capturePaused && !captureStopRequested) {
+		await Delay(250);
+	}
+
+	return captureStopRequested;
+}
+
 async function takeScreenshotForComponent(pedType, type, component, drawable, texture, cameraSettings) {
+	if (await shouldStopCapture()) return;
+
 	const cameraInfo = cameraSettings ? cameraSettings : config.cameraSettings[type][component];
 
 	setWeatherTime();
@@ -57,11 +72,12 @@ async function takeScreenshotForComponent(pedType, type, component, drawable, te
 	SetEntityRotation(ped, camInfo.rotation.x, camInfo.rotation.y, camInfo.rotation.z, 2, false);
 
 	emitNet('takeScreenshot', `${pedType}_${type == 'PROPS' ? 'prop_' : ''}${component}_${drawable}${texture ? `_${texture}`: ''}`, 'clothing');
-	await Delay(2000);
+	await Delay(clothingScreenshotDelay);
 	return;
 }
 
 async function takeScreenshotForObject(object, hash) {
+	if (await shouldStopCapture()) return;
 
 	setWeatherTime();
 
@@ -116,6 +132,8 @@ async function takeScreenshotForObject(object, hash) {
 }
 
 async function takeScreenshotForVehicle(vehicle, hash, model) {
+	if (await shouldStopCapture()) return;
+
 	setWeatherTime();
 
 	await Delay(500);
@@ -303,6 +321,8 @@ function createGreenScreenVehicle(vehicleHash, vehicleModel) {
 
 RegisterCommand('screenshot', async (source, args) => {
 	const modelHashes = [GetHashKey('mp_m_freemode_01'), GetHashKey('mp_f_freemode_01')];
+	capturePaused = false;
+	captureStopRequested = false;
 
 	SendNUIMessage({
 		start: true,
@@ -316,6 +336,7 @@ RegisterCommand('screenshot', async (source, args) => {
 	await Delay(100);
 
 	for (const modelHash of modelHashes) {
+		if (await shouldStopCapture()) break;
 		if (IsModelValid(modelHash)) {
 			if (!HasModelLoaded(modelHash)) {
 				RequestModel(modelHash);
@@ -344,13 +365,16 @@ RegisterCommand('screenshot', async (source, args) => {
 			}, 1);
 
 			for (const type of Object.keys(config.cameraSettings)) {
+				if (await shouldStopCapture()) break;
 				for (const stringComponent of Object.keys(config.cameraSettings[type])) {
+					if (await shouldStopCapture()) break;
 					await ResetPedComponents();
 					await Delay(150);
 					const component = parseInt(stringComponent);
 					if (type === 'CLOTHING') {
 						const drawableVariationCount = GetNumberOfPedDrawableVariations(ped, component);
 						for (let drawable = 0; drawable < drawableVariationCount; drawable++) {
+							if (await shouldStopCapture()) break;
 							const textureVariationCount = GetNumberOfPedTextureVariations(ped, component, drawable);
 							SendNUIMessage({
 								type: config.cameraSettings[type][component].name,
@@ -359,6 +383,7 @@ RegisterCommand('screenshot', async (source, args) => {
 							});
 							if (config.includeTextures) {
 								for (let texture = 0; texture < textureVariationCount; texture++) {
+									if (await shouldStopCapture()) break;
 									await LoadComponentVariation(ped, component, drawable, texture);
 									await takeScreenshotForComponent(pedType, type, component, drawable, texture);
 								}
@@ -370,6 +395,7 @@ RegisterCommand('screenshot', async (source, args) => {
 					} else if (type === 'PROPS') {
 						const propVariationCount = GetNumberOfPedPropDrawableVariations(ped, component);
 						for (let prop = 0; prop < propVariationCount; prop++) {
+							if (await shouldStopCapture()) break;
 							const textureVariationCount = GetNumberOfPedPropTextureVariations(ped, component, prop);
 							SendNUIMessage({
 								type: config.cameraSettings[type][component].name,
@@ -379,6 +405,7 @@ RegisterCommand('screenshot', async (source, args) => {
 
 							if (config.includeTextures) {
 								for (let texture = 0; texture < textureVariationCount; texture++) {
+									if (await shouldStopCapture()) break;
 									await LoadPropVariation(ped, component, prop, texture);
 									await takeScreenshotForComponent(pedType, type, component, prop, texture);
 								}
@@ -409,6 +436,8 @@ RegisterCommand('screenshot', async (source, args) => {
 });
 
 RegisterCommand('customscreenshot', async (source, args) => {
+	capturePaused = false;
+	captureStopRequested = false;
 
 	const type = args[2].toUpperCase();
 	const component = parseInt(args[0]);
@@ -446,6 +475,7 @@ RegisterCommand('customscreenshot', async (source, args) => {
 	await Delay(100);
 
 	for (const modelHash of modelHashes) {
+		if (await shouldStopCapture()) break;
 		if (IsModelValid(modelHash)) {
 			if (!HasModelLoaded(modelHash)) {
 				RequestModel(modelHash);
@@ -483,6 +513,7 @@ RegisterCommand('customscreenshot', async (source, args) => {
 				if (type === 'CLOTHING') {
 					const drawableVariationCount = GetNumberOfPedDrawableVariations(ped, component);
 					for (drawable = 0; drawable < drawableVariationCount; drawable++) {
+						if (await shouldStopCapture()) break;
 						const textureVariationCount = GetNumberOfPedTextureVariations(ped, component, drawable);
 						SendNUIMessage({
 							type: config.cameraSettings[type][component].name,
@@ -491,6 +522,7 @@ RegisterCommand('customscreenshot', async (source, args) => {
 						});
 						if (config.includeTextures) {
 							for (let texture = 0; texture < textureVariationCount; texture++) {
+								if (await shouldStopCapture()) break;
 								await LoadComponentVariation(ped, component, drawable, texture);
 								await takeScreenshotForComponent(pedType, type, component, drawable, texture, cameraSettings);
 							}
@@ -502,6 +534,7 @@ RegisterCommand('customscreenshot', async (source, args) => {
 				} else if (type === 'PROPS') {
 					const propVariationCount = GetNumberOfPedPropDrawableVariations(ped, component);
 					for (prop = 0; prop < propVariationCount; prop++) {
+						if (await shouldStopCapture()) break;
 						const textureVariationCount = GetNumberOfPedPropTextureVariations(ped, component, prop);
 						SendNUIMessage({
 							type: config.cameraSettings[type][component].name,
@@ -511,6 +544,7 @@ RegisterCommand('customscreenshot', async (source, args) => {
 
 						if (config.includeTextures) {
 							for (let texture = 0; texture < textureVariationCount; texture++) {
+								if (await shouldStopCapture()) break;
 								await LoadPropVariation(ped, component, prop, texture);
 								await takeScreenshotForComponent(pedType, type, component, prop, texture, cameraSettings);
 							}
@@ -526,6 +560,7 @@ RegisterCommand('customscreenshot', async (source, args) => {
 
 					if (config.includeTextures) {
 						for (let texture = 0; texture < textureVariationCount; texture++) {
+							if (await shouldStopCapture()) break;
 							await LoadComponentVariation(ped, component, drawable, texture);
 							await takeScreenshotForComponent(pedType, type, component, drawable, texture, cameraSettings);
 						}
@@ -538,6 +573,7 @@ RegisterCommand('customscreenshot', async (source, args) => {
 
 					if (config.includeTextures) {
 						for (let texture = 0; texture < textureVariationCount; texture++) {
+							if (await shouldStopCapture()) break;
 							await LoadPropVariation(ped, component, prop, texture);
 							await takeScreenshotForComponent(pedType, type, component, prop, texture, cameraSettings);
 						}
@@ -565,6 +601,8 @@ RegisterCommand('customscreenshot', async (source, args) => {
 });
 
 RegisterCommand('screenshotobject', async (source, args) => {
+	capturePaused = false;
+	captureStopRequested = false;
 	let modelHash = isNaN(Number(args[0])) ? GetHashKey(args[0]) : Number(args[0]);
 	const ped = GetPlayerPed(-1);
 
@@ -620,6 +658,8 @@ RegisterCommand('screenshotobject', async (source, args) => {
 });
 
 RegisterCommand('screenshotvehicle', async (source, args) => {
+	capturePaused = false;
+	captureStopRequested = false;
 	const vehicles = (config.useQBVehicles && QBCore != null) ? Object.keys(QBCore.Shared.Vehicles) : GetAllVehicleModels();
 	const ped = PlayerPedId();
 	const type = args[0].toLowerCase();
@@ -642,6 +682,7 @@ RegisterCommand('screenshotvehicle', async (source, args) => {
 			start: true,
 		});
 		for (const vehicleModel of vehicles) {
+			if (await shouldStopCapture()) break;
 			const vehicleHash = GetHashKey(vehicleModel);
 			if (!IsModelValid(vehicleHash)) continue;
 
@@ -732,6 +773,25 @@ RegisterCommand('screenshotvehicle', async (source, args) => {
 	cam = null;
 });
 
+RegisterCommand('screenshotpause', () => {
+	capturePaused = true;
+	console.log('Greenscreener capture paused.');
+});
+
+RegisterCommand('screenshotresume', () => {
+	capturePaused = false;
+	console.log('Greenscreener capture resumed.');
+});
+
+RegisterCommand('screenshotstop', () => {
+	captureStopRequested = true;
+	capturePaused = false;
+	SendNUIMessage({
+		end: true,
+	});
+	console.log('Greenscreener capture stop requested.');
+});
+
 
 
 setImmediate(() => {
@@ -766,6 +826,18 @@ setImmediate(() => {
 				{name:"primarycolor", help:"The primary vehicle color to take a screenshot of (optional) See: https://wiki.rage.mp/index.php?title=Vehicle_Colors"},
 				{name:"secondarycolor", help:"The secondary vehicle color to take a screenshot of (optional) See: https://wiki.rage.mp/index.php?title=Vehicle_Colors"},
 			]
+		},
+		{
+			name: '/screenshotpause',
+			help: 'pause active greenscreener capture',
+		},
+		{
+			name: '/screenshotresume',
+			help: 'resume paused greenscreener capture',
+		},
+		{
+			name: '/screenshotstop',
+			help: 'stop active greenscreener capture',
 		}
 	])
   });

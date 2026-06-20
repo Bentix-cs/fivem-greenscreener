@@ -17,6 +17,7 @@ For commercial usage, please reach out to me on Discord to discuss the condition
 - Minimalistic progress UI for user convenience
 - Almost completely invisible ped
 - Customizable camera positions through configuration settings
+- Configurable delay between clothing screenshots
 - Option to enable cycling through texture variations
 - Automatic removal of the greenscreen backdrop (courtesy of [@hakanesnn](https://github.com/hakanesnn))
 - Utilizes a large greenscreen box (thanks to [@jimgordon20](https://github.com/jimgordon20/jim_g_green_screen))
@@ -53,6 +54,10 @@ Utilize the command `/customscreenshot` to capture a specific clothing item, wit
 `/customscreenshot 11 17 clothing male {"fov": 55, "rotation": { "x": 0, "y": 0, "z": 15}, "zPos": 0.26}`
 
 `/customscreenshot 11 all clothing male {"fov": 55, "rotation": { "x": 0, "y": 0, "z": 15}, "zPos": 0.26}`
+
+You can adjust `clothingScreenshotDelay` in `config.json` to control how long the scanner waits after each clothing or prop screenshot before moving to the next variation. Lower values scan faster, while higher values can help if screenshots are captured before clothing finishes rendering.
+
+While a long capture is running, you can use `/screenshotpause` to pause it, `/screenshotresume` to continue it, and `/screenshotstop` to stop it early.
 
 
 ### Screenshot objects/props
