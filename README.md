@@ -21,7 +21,7 @@ For commercial usage, please reach out to me on Discord to discuss the condition
 - Configurable delay between clothing screenshots
 - Pause, resume, and stop controls for long capture sessions
 - Configurable output directory, including an optional server convar override
-- Option to enable cycling through texture variations
+- Scans every clothing and prop texture variation by default
 - Automatic removal of the greenscreen backdrop (courtesy of [@hakanesnn](https://github.com/hakanesnn))
 - Utilizes a large greenscreen box (thanks to [@jimgordon20](https://github.com/jimgordon20/jim_g_green_screen))
 
@@ -92,6 +92,16 @@ You can adjust `clothingScreenshotDelay` in `config.json` to control how long th
 ```json
 {
   "clothingScreenshotDelay": 150
+}
+```
+
+### Texture variations
+
+Texture scanning is enabled by default. With `includeTextures` set to `true`, clothing and prop captures iterate through every available texture variation for each drawable or prop. Set it to `false` if you only want the first texture for a faster scan.
+
+```json
+{
+  "includeTextures": true
 }
 ```
 

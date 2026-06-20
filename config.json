@@ -1,6 +1,6 @@
 {
   "debug": false,
-  "includeTextures": false,
+  "includeTextures": true,
   "//__comment__//textures": "The image generation will take much longer and you will have much more images!",
   "overwriteExistingImages": true,
 	"//__comment__//overwrite": "If false, existing image files will be skipped instead of overwritten",
