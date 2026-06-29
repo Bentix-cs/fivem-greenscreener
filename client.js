@@ -383,6 +383,7 @@ function createGreenScreenVehicle(vehicleHash, vehicleModel) {
 			}
 		}
 		const vehicle = CreateVehicle(vehicleHash, config.greenScreenVehiclePosition.x, config.greenScreenVehiclePosition.y, config.greenScreenVehiclePosition.z, 0, true, true);
+		SetVehicleDirtLevel(vehicle, 0);
 		if (vehicle === 0) {
 			clearTimeout(timeout);
 			resolve(null);
