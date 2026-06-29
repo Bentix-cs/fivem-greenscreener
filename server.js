@@ -35,15 +35,25 @@ try {
 			console.log(`DEBUG: Processing screenshot: ${filename}.png`);
 		}
 
+		// Note: we intentionally do NOT pass `fileName` to screenshot-basic.
+		// With a fileName set, screenshot-basic moves the staged upload into this
+		// resource's folder, which trips FiveM's cross-resource fs.write permission
+		// check on recent FXServer builds. Instead we request the screenshot as a
+		// base64 data URI and write it ourselves, since a resource is always allowed
+		// to write to its own folder.
 		exports['screenshot-basic'].requestClientScreenshot(
 			source,
 			{
-				fileName: fullFilePath,
 				encoding: 'png',
 				quality: 1.0,
 			},
-			async (err, fileName) => {
-				let image = await imagejs.Image.load(fileName);
+			async (err, data) => {
+				if (err) {
+					console.error(`Screenshot failed for ${filename}.png: ${err}`);
+					return;
+				}
+
+				let image = await imagejs.Image.load(data);
 
 				// Apply greenscreen removal
 				for (let x = 0; x < image.width; x++) {
@@ -97,7 +107,7 @@ try {
 					image.height = croppedImage.height;
 				}
 
-				image.save(fileName);
+				image.save(fullFilePath);
 			}
 		);
 	});
