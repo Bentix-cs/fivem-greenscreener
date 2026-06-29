@@ -111,6 +111,26 @@ try {
 			}
 		);
 	});
+
+	// --- /clothes panel support ------------------------------------------------
+	// Clothing and props are both written into images/clothing.
+	const clothingPath = `${mainSavePath}/clothing`;
+
+	// Returns the PNG filenames already on disk so the panel can show how many
+	// are done and skip them when resuming a run. The client matches these names
+	// against the ones it is about to capture.
+	onNet('greenscreener:requestState', () => {
+		const src = source; // capture before any await/emit
+		let existing = [];
+		try {
+			if (fs.existsSync(clothingPath)) {
+				existing = fs.readdirSync(clothingPath).filter((f) => f.toLowerCase().endsWith('.png'));
+			}
+		} catch (e) {
+			console.error(`greenscreener: error reading state: ${e.message}`);
+		}
+		emitNet('greenscreener:state', src, { existing });
+	});
 } catch (error) {
 	console.error(error.message);
 }

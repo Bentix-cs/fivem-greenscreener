@@ -3,15 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="nui://game/ui/jquery.js" type="text/javascript"></script>
-    <script src="script.js"></script>
-    <title>Progress</title>
+    <title>Greenscreener</title>
 </head>
 <body>
+    <!-- Simple progress overlay for the legacy chat commands (/screenshot, ...) -->
     <div id="container" style="display: none;">
         <p id="text">Progress 0/10 Masks</p>
     </div>
+
+    <!-- /clothes control panel -->
+    <div id="clothes-panel" class="hidden">
+        <header>
+            <span class="dot"></span>
+            <h1>Screenshot Generator</h1>
+            <span class="sub">fivem-greenscreener</span>
+        </header>
+
+        <div class="body">
+            <!-- Gender -->
+            <section class="block">
+                <div class="block-title">Gender</div>
+                <div class="seg" id="gender-seg">
+                    <button class="seg-btn" data-gender="male">Male</button>
+                    <button class="seg-btn active" data-gender="female">Female</button>
+                    <button class="seg-btn" data-gender="both">Both</button>
+                </div>
+            </section>
+
+            <!-- Components -->
+            <section class="block">
+                <div class="block-title">
+                    Components
+                    <button class="link-btn" id="toggle-all">Toggle all</button>
+                </div>
+                <div class="comp-group">
+                    <div class="comp-group-name">Clothing</div>
+                    <div class="comp-list" id="list-clothing"></div>
+                </div>
+                <div class="comp-group">
+                    <div class="comp-group-name">Props</div>
+                    <div class="comp-list" id="list-props"></div>
+                </div>
+            </section>
+
+            <!-- Options -->
+            <section class="block">
+                <div class="block-title">Options</div>
+                <label class="opt"><input type="checkbox" id="opt-textures"><span>Include textures</span></label>
+                <label class="opt"><input type="checkbox" id="opt-skip" checked><span>Skip already captured</span></label>
+            </section>
+
+            <!-- Progress -->
+            <section class="block progress-block">
+                <div class="bar"><div class="bar-fill" id="bar-fill"></div></div>
+                <div class="prog-row">
+                    <span id="prog-counts">0 / 0</span>
+                    <span id="prog-percent">0%</span>
+                </div>
+                <div class="prog-row sub-row">
+                    <span>ETA <b id="prog-eta">--:--</b></span>
+                    <span><b id="prog-rate">0.00</b> img/s</span>
+                </div>
+                <div class="prog-label" id="prog-label">Idle</div>
+            </section>
+
+            <!-- Controls -->
+            <section class="controls">
+                <button class="btn primary" id="btn-start">Start</button>
+                <button class="btn" id="btn-pause" disabled>Pause</button>
+                <button class="btn danger" id="btn-stop" disabled>Stop</button>
+            </section>
+            <section class="controls">
+                <button class="btn ghost" id="btn-close">Close</button>
+            </section>
+            <div class="state-line" id="state-line"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>

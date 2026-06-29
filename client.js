@@ -15,6 +15,78 @@ if (config.useQBVehicles) {
 	QBCore = exports[config.coreResourceName].GetCoreObject();
 }
 
+// ===========================================================================
+//  /clothes control panel
+//  ---------------------------------------------------------------------------
+//  An optional NUI front-end for clothing/prop capture. It drives the same
+//  capture helpers used by the chat commands (takeScreenshotForComponent,
+//  LoadComponentVariation, ...) but adds: component/gender selection, a live
+//  progress bar with ETA, pause/resume/stop, and a "skip already captured"
+//  option that lets a long run be resumed simply by launching it again.
+//
+//  Flow: the `clothesJob` object below is the single source of truth for an
+//  in-flight run. NUI buttons flip its `paused` / `stopRequested` flags via
+//  NUI callbacks; the capture loop (runClothingJob) reads them cooperatively.
+// ===========================================================================
+const clothesJob = {
+	running: false,
+	paused: false,
+	stopRequested: false,
+	total: 0,
+	done: 0,
+	times: [], // rolling capture durations (ms), used to estimate the ETA
+};
+// PNG filenames already present in images/clothing, fetched from the server.
+// Used both to seed the initial progress count and to skip captures on resume.
+let lastExisting = new Set();
+
+// Builds the exact name used by takeScreenshotForComponent so the "skip already
+// captured" check matches what the server actually writes to disk.
+function clothingFileName(pedType, type, component, drawable, texture) {
+	return `${pedType}_${type == 'PROPS' ? 'prop_' : ''}${component}_${drawable}${texture ? `_${texture}` : ''}`;
+}
+
+// Cooperative pause: the capture loop awaits this before each item, so a run
+// can be held without busy-looping and resumes as soon as `paused` clears.
+async function waitWhilePaused() {
+	while (clothesJob.paused && !clothesJob.stopRequested) {
+		await Delay(150);
+	}
+}
+
+// Formats a seconds count as mm:ss (or h:mm:ss) for the ETA readout.
+function formatETA(seconds) {
+	if (!isFinite(seconds) || seconds < 0) return '--:--';
+	seconds = Math.round(seconds);
+	const h = Math.floor(seconds / 3600);
+	const m = Math.floor((seconds % 3600) / 60);
+	const s = seconds % 60;
+	const pad = (n) => String(n).padStart(2, '0');
+	return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
+}
+
+// Pushes the current progress snapshot to the NUI. ETA and rate are derived
+// from the rolling average of recent capture times so they reflect the current
+// speed rather than the whole-run average.
+function emitClothesProgress(label) {
+	const remaining = Math.max(0, clothesJob.total - clothesJob.done);
+	const avg = clothesJob.times.length
+		? clothesJob.times.reduce((a, b) => a + b, 0) / clothesJob.times.length
+		: 0;
+	const etaSec = avg ? (avg * remaining) / 1000 : Infinity;
+	const rate = avg ? 1000 / avg : 0;
+	SendNUIMessage({
+		action: 'progress',
+		done: clothesJob.done,
+		total: clothesJob.total,
+		percent: clothesJob.total ? Math.floor((clothesJob.done / clothesJob.total) * 100) : 0,
+		eta: formatETA(etaSec),
+		rate: rate.toFixed(2),
+		label: label || '',
+		paused: clothesJob.paused,
+	});
+}
+
 async function takeScreenshotForComponent(pedType, type, component, drawable, texture, cameraSettings) {
 	const cameraInfo = cameraSettings ? cameraSettings : config.cameraSettings[type][component];
 
@@ -56,7 +128,7 @@ async function takeScreenshotForComponent(pedType, type, component, drawable, te
 
 	SetEntityRotation(ped, camInfo.rotation.x, camInfo.rotation.y, camInfo.rotation.z, 2, false);
 
-	emitNet('takeScreenshot', `${pedType}_${type == 'PROPS' ? 'prop_' : ''}${component}_${drawable}${texture ? `_${texture}`: ''}`, 'clothing');
+	emitNet('takeScreenshot', clothingFileName(pedType, type, component, drawable, texture), 'clothing');
 	await Delay(2000);
 	return;
 }
@@ -213,8 +285,26 @@ function setWeatherTime() {
 	NetworkOverrideClockMillisecondsPerGameMinute(1000000);
 }
 
+// Hides the entire native HUD (radar, area/street/vehicle names, notifications,
+// wanted stars, etc.) every frame while capturing, so none of it gets baked into
+// a screenshot. HideHudAndRadarThisFrame is a "ThisFrame" native, hence the tick.
+let hudHideInterval = null;
+function startHudHide() {
+	if (hudHideInterval) return;
+	hudHideInterval = setInterval(() => {
+		HideHudAndRadarThisFrame();
+	}, 0);
+}
+function stopHudHide() {
+	if (hudHideInterval) {
+		clearInterval(hudHideInterval);
+		hudHideInterval = null;
+	}
+}
+
 function stopWeatherResource() {
 	if (config.debug) console.log(`DEBUG: Stopping Weather Resource`);
+	startHudHide(); // hide the whole native HUD so it doesn't appear in the screenshots
 	if ((GetResourceState('qb-weathersync') == 'started') || (GetResourceState('qbx_weathersync') == 'started')) {
 		TriggerEvent('qb-weathersync:client:DisableSync');
 		return true;
@@ -222,6 +312,7 @@ function stopWeatherResource() {
 		TriggerEvent('weathersync:toggleSync')
 		return true;
 	} else if (GetResourceState('esx_wsync') == 'started') {
+		stopHudHide(); // capture is aborting, restore the HUD
 		SendNUIMessage({
 			error: 'weathersync',
 		});
@@ -238,6 +329,7 @@ function stopWeatherResource() {
 
 function startWeatherResource() {
 	if (config.debug) console.log(`DEBUG: Starting Weather Resource again`);
+	stopHudHide(); // restore the HUD that was hidden for the capture
 	if ((GetResourceState('qb-weathersync') == 'started') || (GetResourceState('qbx_weathersync') == 'started')) {
 		TriggerEvent('qb-weathersync:client:EnableSync');
 	} else if (GetResourceState('weathersync') == 'started') {
@@ -339,6 +431,10 @@ RegisterCommand('screenshot', async (source, args) => {
 			FreezeEntityPosition(ped, true);
 			await Delay(50);
 			SetPlayerControl(playerId, false);
+
+			// Wait for the scene to stream in around the greenscreen before the first
+			// capture, otherwise the first screenshot can come out completely black.
+			await waitForSceneLoaded(ped);
 
 			interval = setInterval(() => {
 				ClearPedTasksImmediately(ped);
@@ -474,6 +570,10 @@ RegisterCommand('customscreenshot', async (source, args) => {
 			await Delay(50);
 			SetPlayerControl(playerId, false);
 
+			// Wait for the scene to stream in around the greenscreen before the first
+			// capture, otherwise the first screenshot can come out completely black.
+			await waitForSceneLoaded(ped);
+
 			ResetPedComponents();
 			await Delay(150);
 
@@ -607,6 +707,9 @@ RegisterCommand('screenshotobject', async (source, args) => {
 
 	await Delay(50);
 
+	// Wait for the scene to stream in before capturing (avoids a black image).
+	await waitForSceneLoaded(ped);
+
 	await takeScreenshotForObject(object, modelHash);
 
 
@@ -637,6 +740,9 @@ RegisterCommand('screenshotvehicle', async (source, args) => {
 	ClearAreaOfVehicles(config.greenScreenPosition.x, config.greenScreenPosition.y, config.greenScreenPosition.z, 10, false, false, false, false, false);
 
 	await Delay(100);
+
+	// Wait for the scene to stream in before capturing (avoids black images).
+	await waitForSceneLoaded(ped);
 
 	if (type === 'all') {
 		SendNUIMessage({
@@ -735,8 +841,249 @@ RegisterCommand('screenshotvehicle', async (source, args) => {
 
 
 
+// ---------------------------------------------------------------------------
+//  /clothes control panel: job engine + NUI wiring
+// ---------------------------------------------------------------------------
+
+// Switches the player ped to the requested freemode model and places/freezes it
+// on the greenscreen, mirroring the setup used by the /screenshot command.
+async function loadGenderModel(gender) {
+	const modelHash = gender === 'female' ? GetHashKey('mp_f_freemode_01') : GetHashKey('mp_m_freemode_01');
+	if (!IsModelValid(modelHash)) return null;
+	if (!HasModelLoaded(modelHash)) {
+		RequestModel(modelHash);
+		while (!HasModelLoaded(modelHash)) {
+			await Delay(100);
+		}
+	}
+	SetPlayerModel(playerId, modelHash);
+	await Delay(150);
+	SetModelAsNoLongerNeeded(modelHash);
+	await Delay(150);
+	ped = PlayerPedId();
+	SetEntityRotation(ped, config.greenScreenRotation.x, config.greenScreenRotation.y, config.greenScreenRotation.z, 0, false);
+	SetEntityCoordsNoOffset(ped, config.greenScreenPosition.x, config.greenScreenPosition.y, config.greenScreenPosition.z, false, false, false);
+	FreezeEntityPosition(ped, true);
+	await Delay(50);
+	SetPlayerControl(playerId, false);
+	return ped;
+}
+
+// Waits until the map has streamed in (collision loaded) around the ped, with a
+// timeout so it never hangs. Without this the first screenshot can come out black
+// because the scene around the greenscreen hasn't finished loading yet.
+async function waitForSceneLoaded(targetPed) {
+	const [x, y, z] = GetEntityCoords(targetPed, false);
+	const start = GetGameTimer();
+	while (!HasCollisionLoadedAroundEntity(targetPed) && GetGameTimer() - start < 5000) {
+		RequestCollisionAtCoord(x, y, z);
+		await Delay(100);
+	}
+}
+
+// Restores game state after a run finishes or is stopped: clears the task
+// loop, hands control back, drops cameras and re-enables the weather resource.
+function cleanupClothesJob() {
+	if (interval) clearInterval(interval);
+	SetPlayerControl(playerId, true);
+	if (ped) FreezeEntityPosition(ped, false);
+	SetPedOnGround();
+	startWeatherResource();
+	DestroyAllCams(true);
+	if (cam) DestroyCam(cam, true);
+	RenderScriptCams(false, false, 0, true, false, 0);
+	camInfo = null;
+	cam = null;
+	clothesJob.running = false;
+	clothesJob.paused = false;
+	clothesJob.stopRequested = false;
+}
+
+// Runs a full capture pass driven by the panel selection.
+//   opts = {
+//     genders:         ['male'] | ['female'] | ['male','female']
+//     components:      { CLOTHING: [int...], PROPS: [int...] }  (component ids)
+//     includeTextures: also iterate every texture of each drawable
+//     skipExisting:    skip items whose PNG already exists (enables resuming)
+//   }
+// It runs in two phases: first a pre-scan that enumerates every item so the
+// total (and therefore the % and ETA) is known up front, then the capture pass.
+async function runClothingJob(opts) {
+	if (clothesJob.running) return;
+	clothesJob.running = true;
+	clothesJob.paused = false;
+	clothesJob.stopRequested = false;
+	clothesJob.times = [];
+	clothesJob.done = 0;
+	clothesJob.total = 0;
+
+	const includeTextures = !!opts.includeTextures;
+	const skipExisting = opts.skipExisting !== false; // defaults to true
+	const existing = lastExisting;
+	const genders = opts.genders && opts.genders.length ? opts.genders : ['male', 'female'];
+	const selected = opts.components || { CLOTHING: [], PROPS: [] };
+
+	if (!stopWeatherResource()) {
+		SendNUIMessage({ action: 'error', error: 'weathersync' });
+		clothesJob.running = false;
+		return;
+	}
+	DisableIdleCamera(true);
+	await Delay(100);
+
+	// --- Pre-scan: enumerate every item across selected genders for an exact total/ETA ---
+	SendNUIMessage({ action: 'progress', done: 0, total: 0, percent: 0, eta: '--:--', rate: '0.00', label: 'Calculating...' });
+	const items = [];
+	for (const gender of genders) {
+		if (clothesJob.stopRequested) break;
+		const p = await loadGenderModel(gender);
+		if (!p) continue;
+		for (const type of ['CLOTHING', 'PROPS']) {
+			const comps = selected[type] || [];
+			for (const component of comps) {
+				if (type === 'CLOTHING') {
+					const dCount = GetNumberOfPedDrawableVariations(ped, component);
+					for (let drawable = 0; drawable < dCount; drawable++) {
+						if (includeTextures) {
+							const tCount = GetNumberOfPedTextureVariations(ped, component, drawable);
+							for (let texture = 0; texture < tCount; texture++) items.push({ gender, pedType: gender, type, component, drawable, texture });
+						} else {
+							items.push({ gender, pedType: gender, type, component, drawable, texture: null });
+						}
+					}
+				} else {
+					const pCount = GetNumberOfPedPropDrawableVariations(ped, component);
+					for (let prop = 0; prop < pCount; prop++) {
+						if (includeTextures) {
+							const tCount = GetNumberOfPedPropTextureVariations(ped, component, prop);
+							for (let texture = 0; texture < tCount; texture++) items.push({ gender, pedType: gender, type, component, drawable: prop, texture });
+						} else {
+							items.push({ gender, pedType: gender, type, component, drawable: prop, texture: null });
+						}
+					}
+				}
+			}
+		}
+	}
+
+	clothesJob.total = items.length;
+	// Items already on disk count as done, so a resumed run's bar starts where
+	// the previous one left off instead of at 0%.
+	if (skipExisting) {
+		clothesJob.done = items.filter((it) => existing.has(clothingFileName(it.pedType, it.type, it.component, it.drawable, it.texture) + '.png')).length;
+	}
+	emitClothesProgress('Starting...');
+
+	// Make sure the world has streamed in around the greenscreen before the first
+	// capture, otherwise the first screenshot can come out completely black.
+	await waitForSceneLoaded(ped);
+
+	// --- Capture pass ---
+	let curGender = null;
+	let curComponentKey = null;
+	for (const it of items) {
+		// Cooperative stop/pause: checked between items so a stop closes the
+		// current screenshot cleanly rather than aborting mid-write.
+		if (clothesJob.stopRequested) break;
+		await waitWhilePaused();
+		if (clothesJob.stopRequested) break;
+
+		// Only reload the model when the gender changes (avoids redundant swaps).
+		if (it.gender !== curGender) {
+			await loadGenderModel(it.gender);
+			curGender = it.gender;
+			curComponentKey = null; // force a component reset for the new model
+			if (interval) clearInterval(interval);
+			interval = setInterval(() => ClearPedTasksImmediately(ped), 1);
+		}
+
+		// Reset every component when moving to a new component, so the previous one
+		// (e.g. a mask) doesn't stay on the ped while shooting the next component.
+		const componentKey = `${it.type}:${it.component}`;
+		if (componentKey !== curComponentKey) {
+			await ResetPedComponents();
+			await Delay(150);
+			curComponentKey = componentKey;
+		}
+
+		const file = clothingFileName(it.pedType, it.type, it.component, it.drawable, it.texture) + '.png';
+		if (skipExisting && existing.has(file)) continue; // already captured
+
+		const t0 = GetGameTimer();
+		const label = `${config.cameraSettings[it.type][it.component].name} ${it.drawable}${it.texture != null ? '/' + it.texture : ''} (${it.gender})`;
+		if (it.type === 'CLOTHING') {
+			await LoadComponentVariation(ped, it.component, it.drawable, it.texture);
+		} else {
+			await LoadPropVariation(ped, it.component, it.drawable, it.texture);
+		}
+		await takeScreenshotForComponent(it.pedType, it.type, it.component, it.drawable, it.texture);
+
+		existing.add(file);
+		clothesJob.done++;
+		clothesJob.times.push(GetGameTimer() - t0);
+		if (clothesJob.times.length > 20) clothesJob.times.shift();
+		emitClothesProgress(label);
+	}
+
+	const wasStopped = clothesJob.stopRequested;
+	cleanupClothesJob();
+	SendNUIMessage({ action: 'done', stopped: wasStopped });
+}
+
+// Opens the panel: grabs NUI focus and hands the NUI the selectable components
+// (built from config so it always matches cameraSettings), then asks the server
+// which images already exist to populate the "skip" baseline.
+RegisterCommand('customclothes', () => {
+	SetNuiFocus(true, true);
+	SendNUIMessage({
+		action: 'open',
+		config: {
+			clothing: Object.keys(config.cameraSettings.CLOTHING).map((id) => ({ id: parseInt(id), name: config.cameraSettings.CLOTHING[id].name })),
+			props: Object.keys(config.cameraSettings.PROPS).map((id) => ({ id: parseInt(id), name: config.cameraSettings.PROPS[id].name })),
+		},
+		running: clothesJob.running,
+	});
+	emitNet('greenscreener:requestState');
+}, false);
+
+// Reply from the server with the list of already-captured PNG filenames.
+onNet('greenscreener:state', (data) => {
+	data = data || {};
+	lastExisting = new Set(data.existing || []);
+	SendNUIMessage({ action: 'state', count: (data.existing || []).length });
+});
+
+// Small helper to register a NUI callback and always answer it so the fetch in
+// the NUI resolves.
+function registerNui(name, handler) {
+	RegisterNuiCallbackType(name);
+	on(`__cfx_nui:${name}`, (data, cb) => {
+		try { handler(data || {}); } catch (e) { console.log(`ERROR in NUI callback ${name}: ${e.message}`); }
+		cb('ok');
+	});
+}
+
+// Panel controls. Pause/resume/stop just flip flags on clothesJob; the running
+// capture loop reacts to them on its own.
+registerNui('clothes:start', (data) => {
+	runClothingJob({
+		genders: data.genders,
+		components: data.components,
+		includeTextures: data.includeTextures,
+		skipExisting: data.skipExisting,
+	});
+});
+registerNui('clothes:pause', () => { clothesJob.paused = true; emitClothesProgress(); });
+registerNui('clothes:resume', () => { clothesJob.paused = false; emitClothesProgress(); });
+registerNui('clothes:stop', () => { clothesJob.stopRequested = true; clothesJob.paused = false; });
+registerNui('clothes:close', () => { SetNuiFocus(false, false); });
+
 setImmediate(() => {
 	emit('chat:addSuggestions', [
+		{
+			name: '/customclothes',
+			help: 'open the clothing capture control panel (select components, gender, progress, ETA)',
+		},
 		{
 			name: '/screenshot',
 			help: 'generate clothing screenshots',
@@ -778,4 +1125,5 @@ on('onResourceStop', (resName) => {
 	clearInterval(interval);
 	SetPlayerControl(playerId, true);
 	FreezeEntityPosition(ped, false);
+	SetNuiFocus(false, false); // release the cursor if the panel was open
 });
