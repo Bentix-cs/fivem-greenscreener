@@ -1030,7 +1030,7 @@ async function runClothingJob(opts) {
 // Opens the panel: grabs NUI focus and hands the NUI the selectable components
 // (built from config so it always matches cameraSettings), then asks the server
 // which images already exist to populate the "skip" baseline.
-RegisterCommand('clothes', () => {
+RegisterCommand('customclothes', () => {
 	SetNuiFocus(true, true);
 	SendNUIMessage({
 		action: 'open',
@@ -1078,7 +1078,7 @@ registerNui('clothes:close', () => { SetNuiFocus(false, false); });
 setImmediate(() => {
 	emit('chat:addSuggestions', [
 		{
-			name: '/clothes',
+			name: '/customclothes',
 			help: 'open the clothing capture control panel (select components, gender, progress, ETA)',
 		},
 		{
