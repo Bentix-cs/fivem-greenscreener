@@ -36,11 +36,10 @@ try {
 		}
 
 		// Note: we intentionally do NOT pass `fileName` to screenshot-basic.
-		// With a fileName set, screenshot-basic moves the staged upload into this
-		// resource's folder, which trips FiveM's cross-resource fs.write permission
-		// check on recent FXServer builds. Instead we request the screenshot as a
-		// base64 data URI and write it ourselves, since a resource is always allowed
-		// to write to its own folder.
+		// Doing so would make screenshot-basic move the file into this resource's
+		// folder, which trips FiveM's cross-resource fs.write permission check.
+		// Instead we request the screenshot as a base64 data URI and write it
+		// ourselves, since a resource is always allowed to write to its own folder.
 		exports['screenshot-basic'].requestClientScreenshot(
 			source,
 			{
@@ -110,6 +109,26 @@ try {
 				image.save(fullFilePath);
 			}
 		);
+	});
+
+	// --- /clothes panel support ------------------------------------------------
+	// Clothing and props are both written into images/clothing.
+	const clothingPath = `${mainSavePath}/clothing`;
+
+	// Returns the PNG filenames already on disk so the panel can show how many
+	// are done and skip them when resuming a run. The client matches these names
+	// against the ones it is about to capture.
+	onNet('greenscreener:requestState', () => {
+		const src = source; // capture before any await/emit
+		let existing = [];
+		try {
+			if (fs.existsSync(clothingPath)) {
+				existing = fs.readdirSync(clothingPath).filter((f) => f.toLowerCase().endsWith('.png'));
+			}
+		} catch (e) {
+			console.error(`greenscreener: error reading state: ${e.message}`);
+		}
+		emitNet('greenscreener:state', src, { existing });
 	});
 } catch (error) {
 	console.error(error.message);
