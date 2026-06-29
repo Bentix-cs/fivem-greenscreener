@@ -434,7 +434,6 @@ RegisterCommand('screenshot', async (source, args) => {
 			// Wait for the scene to stream in around the greenscreen before the first
 			// capture, otherwise the first screenshot can come out completely black.
 			await waitForSceneLoaded(ped);
-			await Delay(config.startupDelay || 1500);
 
 			interval = setInterval(() => {
 				ClearPedTasksImmediately(ped);
@@ -573,7 +572,6 @@ RegisterCommand('customscreenshot', async (source, args) => {
 			// Wait for the scene to stream in around the greenscreen before the first
 			// capture, otherwise the first screenshot can come out completely black.
 			await waitForSceneLoaded(ped);
-			await Delay(config.startupDelay || 1500);
 
 			ResetPedComponents();
 			await Delay(150);
@@ -710,7 +708,6 @@ RegisterCommand('screenshotobject', async (source, args) => {
 
 	// Wait for the scene to stream in before capturing (avoids a black image).
 	await waitForSceneLoaded(ped);
-	await Delay(config.startupDelay || 1500);
 
 	await takeScreenshotForObject(object, modelHash);
 
@@ -745,7 +742,6 @@ RegisterCommand('screenshotvehicle', async (source, args) => {
 
 	// Wait for the scene to stream in before capturing (avoids black images).
 	await waitForSceneLoaded(ped);
-	await Delay(config.startupDelay || 1500);
 
 	if (type === 'all') {
 		SendNUIMessage({
@@ -978,10 +974,8 @@ async function runClothingJob(opts) {
 	emitClothesProgress('Starting...');
 
 	// Make sure the world has streamed in around the greenscreen before the first
-	// capture (otherwise the first screenshot can come out completely black): wait
-	// for collision to load, then keep a small fixed delay as an extra buffer.
+	// capture, otherwise the first screenshot can come out completely black.
 	await waitForSceneLoaded(ped);
-	await Delay(config.startupDelay || 1500);
 
 	// --- Capture pass ---
 	let curGender = null;

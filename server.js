@@ -36,10 +36,11 @@ try {
 		}
 
 		// Note: we intentionally do NOT pass `fileName` to screenshot-basic.
-		// Doing so would make screenshot-basic move the file into this resource's
-		// folder, which trips FiveM's cross-resource fs.write permission check.
-		// Instead we request the screenshot as a base64 data URI and write it
-		// ourselves, since a resource is always allowed to write to its own folder.
+		// With a fileName set, screenshot-basic moves the staged upload into this
+		// resource's folder, which trips FiveM's cross-resource fs.write permission
+		// check on recent FXServer builds. Instead we request the screenshot as a
+		// base64 data URI and write it ourselves, since a resource is always allowed
+		// to write to its own folder.
 		exports['screenshot-basic'].requestClientScreenshot(
 			source,
 			{
