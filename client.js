@@ -980,6 +980,7 @@ async function runClothingJob(opts) {
 
 	// --- Capture pass ---
 	let curGender = null;
+	let curComponentKey = null;
 	for (const it of items) {
 		// Cooperative stop/pause: checked between items so a stop closes the
 		// current screenshot cleanly rather than aborting mid-write.
@@ -987,15 +988,22 @@ async function runClothingJob(opts) {
 		await waitWhilePaused();
 		if (clothesJob.stopRequested) break;
 
-		// Only reload the model and reset components when the gender changes,
-		// so items are grouped by gender and we avoid redundant model swaps.
+		// Only reload the model when the gender changes (avoids redundant swaps).
 		if (it.gender !== curGender) {
 			await loadGenderModel(it.gender);
 			curGender = it.gender;
+			curComponentKey = null; // force a component reset for the new model
 			if (interval) clearInterval(interval);
 			interval = setInterval(() => ClearPedTasksImmediately(ped), 1);
+		}
+
+		// Reset every component when moving to a new component, so the previous one
+		// (e.g. a mask) doesn't stay on the ped while shooting the next component.
+		const componentKey = `${it.type}:${it.component}`;
+		if (componentKey !== curComponentKey) {
 			await ResetPedComponents();
 			await Delay(150);
+			curComponentKey = componentKey;
 		}
 
 		const file = clothingFileName(it.pedType, it.type, it.component, it.drawable, it.texture) + '.png';
