@@ -3,6 +3,8 @@
 A small script that allows you to take screenshots of every gta clothing, prop/object or vehicle against a greenscreen.
 You can use them for example in your inventory, clothing store or vehicle store.
 
+**!!! Only use it for development purpose, the script is not meant for production servers !!!**
+
 ## Using the images
 
 You are granted the freedom to utilize the images in your open-source projects with proper accreditation.
